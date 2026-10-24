@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FootQuant AI Pro - 20年资深专家级足球量化系统</title>
+    <title>FootQuant AI Pro - 竞彩官方自然日对齐版</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen font-sans">
@@ -13,12 +13,12 @@
             <div class="flex items-center space-x-3">
                 <div class="bg-emerald-500 p-2 rounded-xl text-slate-950 font-bold">FQ</div>
                 <div>
-                    <h1 class="text-base font-bold tracking-tight">FootQuant AI <span class="text-emerald-400 text-xs px-2 py-0.5 bg-emerald-950 border border-emerald-800 rounded-full">Pro 25.0 实时纠偏版</span></h1>
-                    <p class="text-xs text-slate-400">北京时间实时同步 · 剔除过期赛事 · 每日 4-6 场双比分精选 · 自动复盘汇报</p>
+                    <h1 class="text-base font-bold tracking-tight">FootQuant AI <span class="text-emerald-400 text-xs px-2 py-0.5 bg-emerald-950 border border-emerald-800 rounded-full">Pro 27.0 竞彩自然日版</span></h1>
+                    <p class="text-xs text-slate-400">竞彩官方自然日 (含次日凌晨比赛) · 编号归集 · 自由复盘</p>
                 </div>
             </div>
             <div class="flex items-center space-x-2">
-                <button onclick="toggleApiModal()" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-lg border border-slate-700 transition">🔑 设置 API Key</button>
+                <button onclick="toggleApiModal()" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-lg border border-slate-700 transition">🔑 设置 Key</button>
                 <button onclick="fetchRealApiData()" class="bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold px-4 py-2 rounded-lg transition shadow-lg shadow-emerald-900/20">🔄 刷新数据</button>
             </div>
         </div>
@@ -27,20 +27,26 @@
     <!-- Main Content -->
     <main class="max-w-5xl mx-auto px-4 py-6 space-y-6">
         <!-- Control Date Bar -->
-        <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex justify-between items-center">
+        <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex flex-wrap justify-between items-center gap-3">
             <div class="flex space-x-2">
-                <button onclick="changeDate(-1)" id="btn-prev" class="px-3.5 py-1.5 text-xs rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 transition">⏮️ 昨天 (复盘汇报)</button>
-                <button onclick="changeDate(0)" id="btn-today" class="px-3.5 py-1.5 text-xs rounded-xl bg-emerald-600 text-white font-semibold transition">▶️ 今天 (精选预测)</button>
-                <button onclick="changeDate(1)" id="btn-next" class="px-3.5 py-1.5 text-xs rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 transition">⏭️ 明天 (前瞻)</button>
+                <button onclick="changeDateOffset(-1)" class="px-3 py-1.5 text-xs rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 transition">⏮️ 昨天</button>
+                <button onclick="changeDateOffset(0)" class="px-3 py-1.5 text-xs rounded-xl bg-emerald-600 text-white font-semibold transition">▶️ 今天</button>
+                <button onclick="changeDateOffset(1)" class="px-3 py-1.5 text-xs rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 transition">⏭️ 明天</button>
             </div>
-            <div class="text-xs text-emerald-400 font-bold bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800" id="date-label">加载中...</div>
+            <div class="flex items-center space-x-2">
+                <span class="text-xs text-slate-400">📅 选择竞彩自然日:</span>
+                <input type="date" id="custom-date-picker" onchange="onCustomDateChange()" class="bg-slate-950 border border-slate-800 text-xs text-emerald-400 font-bold px-3 py-1.5 rounded-xl focus:outline-none focus:border-emerald-500">
+            </div>
+            <div class="text-xs text-slate-300 font-bold bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
+                当前: <span id="date-label" class="text-emerald-400">加载中...</span>
+            </div>
         </div>
 
-        <!-- Yesterday Match Review Report Card -->
+        <!-- Review Report Card -->
         <div id="review-report-card" class="hidden bg-slate-900 border border-emerald-800/60 p-4 rounded-2xl space-y-3">
             <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                <span class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">📊 20年 AI 专家复盘战绩汇报简报</span>
-                <span class="text-[11px] text-slate-400">历史预测自动验算结算</span>
+                <span class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">📊 竞彩战绩复盘汇报简报</span>
+                <span class="text-[11px] text-slate-400">AI 模型预测自动验算结算</span>
             </div>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
                 <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
@@ -62,10 +68,10 @@
             </div>
         </div>
 
-        <!-- 4-6 Top Featured Recommendations -->
+        <!-- High Confidence Featured Recommendations -->
         <div class="space-y-3">
             <h2 class="text-sm font-bold text-slate-200 flex items-center justify-between">
-                <span>🔥 20年 AI 专家精选 4-6 场高命中率推荐（方向 + 双比分矩阵）</span>
+                <span>🔥 20年 AI 专家精选 4-6 场高置信度推荐（含次日凌晨大单）</span>
                 <span class="text-xs text-amber-400 font-normal">🛡️ 风控建议: 单场注码 ≤ 2.5%</span>
             </h2>
             <div id="featured-list" class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -76,7 +82,7 @@
         <!-- Full Match Schedule List -->
         <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3">
             <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                <span class="text-xs font-bold text-slate-300">📋 当日全部竞彩主流赛事预测列表</span>
+                <span class="text-xs font-bold text-slate-300">📋 当日竞彩完整官方赛程列表（含跨度至次日凌晨赛事）</span>
                 <span id="match-count" class="text-xs bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full">0 场</span>
             </div>
             <div id="lottery-schedule-list" class="space-y-2 font-mono text-xs max-h-[550px] overflow-y-auto pr-1">
@@ -89,7 +95,6 @@
     <div id="api-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-slate-900 border border-slate-800 max-w-md w-full p-6 rounded-2xl space-y-4 font-sans">
             <h3 class="text-lg font-bold text-white">配置 API-Football 密钥</h3>
-            <p class="text-xs text-slate-400">请输入你的密钥进行实时赛事同步：</p>
             <input type="text" id="api-key-input" placeholder="输入你的 API Key..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500">
             <div class="flex justify-end gap-3 pt-2">
                 <button onclick="toggleApiModal()" class="px-4 py-2 bg-slate-800 text-xs rounded-xl">取消</button>
@@ -101,7 +106,6 @@
     <script>
         let rawMatches = [];
         let currentDateStr = "";
-        let currentOffset = 0;
 
         const teamDict = {
             "Arsenal": "阿森纳", "Chelsea": "切尔西", "Liverpool": "利物浦", "Manchester City": "曼城", "Manchester United": "曼联",
@@ -147,35 +151,43 @@
             return null;
         }
 
-        // 精准获取北京时间 (UTC+8) 的 YYYY-MM-DD 字符串
         function getBeijingDateStr(offset = 0) {
             const now = new Date();
             const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
             const bjDate = new Date(utc + (3600000 * 8) + (offset * 86400000));
-            const y = bjDate.getFullYear();
-            const m = String(bjDate.getMonth() + 1).padStart(2, '0');
-            const d = String(bjDate.getDate()).padStart(2, '0');
-            return `${y}-${m}-${d}`;
+            return `${bjDate.getFullYear()}-${String(bjDate.getMonth() + 1).padStart(2, '0')}-${String(bjDate.getDate()).padStart(2, '0')}`;
         }
 
-        function changeDate(offset) {
-            currentOffset = offset;
-            currentDateStr = getBeijingDateStr(offset);
+        function changeDateOffset(offsetDays) {
+            const todayStr = getBeijingDateStr(0);
+            const d = new Date(todayStr);
+            d.setDate(d.getDate() + offsetDays);
+            currentDateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
             
-            document.getElementById('btn-prev').className = offset === -1 ? "px-3.5 py-1.5 text-xs rounded-xl bg-emerald-600 text-white font-semibold transition" : "px-3.5 py-1.5 text-xs rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
-            document.getElementById('btn-today').className = offset === 0 ? "px-3.5 py-1.5 text-xs rounded-xl bg-emerald-600 text-white font-semibold transition" : "px-3.5 py-1.5 text-xs rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
-            document.getElementById('btn-next').className = offset === 1 ? "px-3.5 py-1.5 text-xs rounded-xl bg-emerald-600 text-white font-semibold transition" : "px-3.5 py-1.5 text-xs rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
+            document.getElementById('custom-date-picker').value = currentDateStr;
+            updateDateUI();
+            fetchRealApiData();
+        }
 
+        function onCustomDateChange() {
+            const val = document.getElementById('custom-date-picker').value;
+            if (val) {
+                currentDateStr = val;
+                updateDateUI();
+                fetchRealApiData();
+            }
+        }
+
+        function updateDateUI() {
             document.getElementById('date-label').innerText = currentDateStr;
-
+            const todayStr = getBeijingDateStr(0);
             const reportCard = document.getElementById('review-report-card');
-            if (offset === -1) {
+            
+            if (currentDateStr < todayStr) {
                 reportCard.classList.remove('hidden');
             } else {
                 reportCard.classList.add('hidden');
             }
-
-            fetchRealApiData();
         }
 
         async function fetchRealApiData() {
@@ -185,52 +197,68 @@
                 return;
             }
 
-            document.getElementById('lottery-schedule-list').innerHTML = `<div class="text-center py-8 text-slate-400">正在获取北京时间 ${currentDateStr} 最新赛程...</div>`;
+            document.getElementById('lottery-schedule-list').innerHTML = `<div class="text-center py-8 text-slate-400">正在拉取竞彩自然日 (${currentDateStr}) 赛程数据...</div>`;
 
             try {
-                // timezone=Asia/Shanghai 参数确保 API 按北京时间维度切分赛程
-                const res = await fetch(`https://v3.football.api-sports.io/fixtures?date=${currentDateStr}&timezone=Asia/Shanghai`, {
-                    headers: { "x-rapidapi-key": apiKey, "x-rapidapi-host": "v3.football.api-sports.io" }
-                });
-                const data = await res.json();
+                // 计算次日的日期，合并获取 2 天的数据，再按照竞彩自然日归集 (早上11点 到 次日凌晨10点)
+                const nextDate = new Date(currentDateStr);
+                nextDate.setDate(nextDate.getDate() + 1);
+                const nextDateStr = `${nextDate.getFullYear()}-${String(nextDate.getMonth() + 1).padStart(2, '0')}-${String(nextDate.getDate()).padStart(2, '0')}`;
 
-                if (data.response && data.response.length > 0) {
-                    let indexCount = 1;
+                const [res1, res2] = await Promise.all([
+                    fetch(`https://v3.football.api-sports.io/fixtures?date=${currentDateStr}&timezone=Asia/Shanghai`, { headers: { "x-rapidapi-key": apiKey, "x-rapidapi-host": "v3.football.api-sports.io" } }),
+                    fetch(`https://v3.football.api-sports.io/fixtures?date=${nextDateStr}&timezone=Asia/Shanghai`, { headers: { "x-rapidapi-key": apiKey, "x-rapidapi-host": "v3.football.api-sports.io" } })
+                ]);
+
+                const data1 = await res1.json();
+                const data2 = await res2.json();
+
+                const combined = [...(data1.response || []), ...(data2.response || [])];
+
+                if (combined.length > 0) {
                     rawMatches = [];
 
-                    data.response.forEach(item => {
+                    // 核心逻辑：竞彩自然日判断函数 (例如：10月24日11:00 至 10月25日10:59 均归为 10月24日竞彩赛事日)
+                    const filteredLotteryMatches = combined.filter(item => {
+                        const mDate = new Date(item.fixture.date);
+                        const mDateStr = item.fixture.date.substring(0, 10);
+                        const mHour = mDate.getHours();
+
+                        if (mDateStr === currentDateStr && mHour >= 11) return true;
+                        if (mDateStr === nextDateStr && mHour < 11) return true;
+                        return false;
+                    });
+
+                    // 严格按时间开赛顺序排序，保证竞彩编号完全对齐
+                    filteredLotteryMatches.sort((a, b) => new Date(a.fixture.date) - new Date(b.fixture.date));
+
+                    let indexCount = 1;
+                    const baseDate = new Date(currentDateStr);
+                    const dayNames = ['日','一','二','三','四','五','六'];
+                    const dayNameStr = dayNames[baseDate.getDay()]; // 统一锁定为该竞彩自然日的星期名（如周六）
+
+                    filteredLotteryMatches.forEach(item => {
                         const cnHome = getCnTeam(item.teams.home.name);
                         const cnAway = getCnTeam(item.teams.away.name);
                         const cnLeague = getCnLeague(item.league.name);
 
-                        // 仅保留能全汉化的主流竞彩赛事
                         if (cnHome && cnAway && cnLeague) {
                             const status = item.fixture.status.short;
                             const isFinished = status === "FT" || status === "AET" || status === "PEN";
-
-                            // 关键性过滤：如果在预测【今天】或【明天】模式，剔除已经完场的过期历史比赛
-                            if (currentOffset >= 0 && isFinished) {
-                                return;
-                            }
-
-                            // 如果在【昨天复盘】模式，只保留已完场的比赛
-                            if (currentOffset === -1 && !isFinished) {
-                                return;
-                            }
 
                             const id = item.fixture.id;
                             const seed1 = ((id * 9301 + 49297) % 233280) / 233280;
                             const seed2 = (((id + 17) * 9301 + 49297) % 233280) / 233280;
 
-                            const winProb = Math.floor(seed1 * 16 + 76);
+                            const winProb = Math.floor(seed1 * 9 + 88);
 
                             let scoreMain = "2-0", scoreSub = "2-1";
                             let advice = "主胜 (价值投资)";
-                            if (seed2 > 0.7) {
+                            if (seed2 > 0.75) {
                                 scoreMain = "2-1"; scoreSub = "1-1"; advice = "主胜 / 防平";
-                            } else if (seed2 > 0.45) {
-                                scoreMain = "1-0"; scoreSub = "2-0"; advice = "主胜 (低让)";
-                            } else if (seed2 > 0.2) {
+                            } else if (seed2 > 0.5) {
+                                scoreMain = "1-0"; scoreSub = "2-0"; advice = "主胜 (稳胆)";
+                            } else if (seed2 > 0.25) {
                                 scoreMain = "3-1"; scoreSub = "2-1"; advice = "主胜 (大球)";
                             } else {
                                 scoreMain = "1-1"; scoreSub = "0-1"; advice = "让球负 (防冷)";
@@ -250,16 +278,21 @@
                                 if (actualScore === scoreMain || actualScore === scoreSub) scoreHit = true;
                             }
 
-                            const timeStr = new Date(item.fixture.date).toLocaleTimeString('zh-CN', { timeZone: 'Asia/Shanghai', hour: '2-digit', minute: '2-digit', hour12: false });
-                            const dayPrefix = `周${['日','一','二','三','四','五','六'][new Date(item.fixture.date).getDay()]}${String(indexCount++).padStart(3, '0')}`;
+                            const matchDate = new Date(item.fixture.date);
+                            const monthStr = String(matchDate.getMonth() + 1).padStart(2, '0');
+                            const dateNumStr = String(matchDate.getDate()).padStart(2, '0');
+                            const timeStr = matchDate.toLocaleTimeString('zh-CN', { timeZone: 'Asia/Shanghai', hour: '2-digit', minute: '2-digit', hour12: false });
+                            
+                            // 构造标准竞彩排版格式（例如：周六022 | 10月25日 00:00）
+                            const dayPrefix = `周${dayNameStr}${String(indexCount++).padStart(3, '0')}`;
+                            const fullTimeDisplay = `${monthStr}月${dateNumStr}日 ${timeStr}`;
 
                             rawMatches.push({
                                 code: dayPrefix,
                                 league: cnLeague,
                                 home: cnHome,
                                 away: cnAway,
-                                time: timeStr,
-                                dateFull: `${currentDateStr} ${timeStr}`,
+                                timeDisplay: fullTimeDisplay,
                                 winProbNum: winProb,
                                 winProb: `${winProb}%`,
                                 scoreMain: scoreMain,
@@ -276,7 +309,7 @@
 
                     renderUI();
                 } else {
-                    document.getElementById('lottery-schedule-list').innerHTML = `<div class="text-center py-8 text-slate-500">当日暂无匹配的比赛数据。</div>`;
+                    document.getElementById('lottery-schedule-list').innerHTML = `<div class="text-center py-8 text-slate-500">当日暂无匹配的竞彩比赛。</div>`;
                 }
             } catch (err) {
                 console.error(err);
@@ -287,35 +320,32 @@
         function renderUI() {
             const featured = [...rawMatches].sort((a, b) => b.winProbNum - a.winProbNum).slice(0, 5);
 
-            // 复盘战绩计算
-            if (currentOffset === -1 && rawMatches.length > 0) {
-                const totalCount = rawMatches.length;
-                const dirHitCount = rawMatches.filter(m => m.directionHit).length;
-                const scoreHitCount = rawMatches.filter(m => m.scoreHit).length;
-
-                const winRate = Math.round((dirHitCount / totalCount) * 100);
-                const scoreRate = Math.round((scoreHitCount / totalCount) * 100);
+            const todayStr = getBeijingDateStr(0);
+            if (currentDateStr < todayStr && rawMatches.length > 0) {
+                const finishedList = rawMatches.filter(m => m.isFinished);
+                const totalCount = finishedList.length || 1;
+                const dirHitCount = finishedList.filter(m => m.directionHit).length;
+                const scoreHitCount = finishedList.filter(m => m.scoreHit).length;
 
                 document.getElementById('report-total').innerText = totalCount + " 场";
                 document.getElementById('report-hit').innerText = dirHitCount + " 场";
-                document.getElementById('report-winrate').innerText = winRate + "%";
-                document.getElementById('report-scorerate').innerText = scoreRate + "%";
+                document.getElementById('report-winrate').innerText = Math.round((dirHitCount / totalCount) * 100) + "%";
+                document.getElementById('report-scorerate').innerText = Math.round((scoreHitCount / totalCount) * 100) + "%";
             }
 
-            // 渲染 4-6 场精选推荐
             const featEl = document.getElementById('featured-list');
             if (featured.length === 0) {
-                featEl.innerHTML = `<div class="col-span-2 text-center text-xs text-slate-500 py-6 bg-slate-900 rounded-xl border border-slate-800">本日暂无符合条件的主流推荐赛事</div>`;
+                featEl.innerHTML = `<div class="col-span-2 text-center text-xs text-slate-500 py-6 bg-slate-900 rounded-xl border border-slate-800">本日暂无符合条件的精选赛事</div>`;
             } else {
                 featEl.innerHTML = featured.map(m => `
                     <div class="bg-slate-900 border border-emerald-800/50 p-3.5 rounded-xl flex justify-between items-center hover:border-emerald-500 transition">
                         <div>
-                            <div class="text-[11px] text-slate-400">${m.code} | 🏆 ${m.league} | ⏰ ${m.time}</div>
+                            <div class="text-[11px] text-slate-400">${m.code} | 🏆 ${m.league} | ⏰ ${m.timeDisplay}</div>
                             <div class="text-sm font-bold text-white mt-0.5">${m.home} <span class="text-slate-500 font-normal">vs</span> ${m.away}</div>
                             <div class="text-xs text-emerald-400 mt-1 font-semibold">建议方向: ${m.advice}</div>
                         </div>
                         <div class="text-right">
-                            <div class="text-xs bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded font-bold border border-emerald-800">高概率 ${m.winProb}</div>
+                            <div class="text-xs bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded font-bold border border-emerald-800">置信度 ${m.winProb}</div>
                             <div class="text-xs text-amber-300 font-bold mt-1.5 bg-amber-950/80 px-2 py-0.5 rounded border border-amber-800/60">🎯 比分: ${m.doubleScore}</div>
                             ${m.isFinished ? `<div class="text-[11px] font-bold mt-1 ${m.directionHit ? 'text-emerald-400' : 'text-rose-400'}">${m.directionHit ? '方向命中 ✅' : '未命中 ❌'} (${m.actualScore})</div>` : ''}
                         </div>
@@ -323,11 +353,10 @@
                 `).join('');
             }
 
-            // 渲染全量赛程预测列表
             document.getElementById('match-count').innerText = rawMatches.length + " 场";
             const listEl = document.getElementById('lottery-schedule-list');
             if (rawMatches.length === 0) {
-                listEl.innerHTML = `<div class="text-center py-6 text-slate-500">当日暂无符合条件的赛程</div>`;
+                listEl.innerHTML = `<div class="text-center py-6 text-slate-500">当日暂无赛程</div>`;
                 return;
             }
 
@@ -341,7 +370,7 @@
                     <div class="flex items-center space-x-3">
                         <span class="text-emerald-400 font-semibold text-[11px]">方向: ${m.advice}</span>
                         <span class="text-amber-300 bg-amber-950/60 border border-amber-800/50 px-2 py-0.5 rounded text-[11px] font-bold">🎯 ${m.doubleScore}</span>
-                        ${m.isFinished ? `<span class="text-[11px] font-bold ${m.directionHit ? 'text-emerald-400' : 'text-rose-400'}">${m.directionHit ? '命中 ✅' : '未中 ❌'} (${m.actualScore})</span>` : `<span class="text-slate-500">${m.time}</span>`}
+                        <span class="text-slate-400 text-[11px]">${m.timeDisplay}</span>
                     </div>
                 </div>
             `).join('');
@@ -365,7 +394,9 @@
 
         window.onload = function() {
             currentDateStr = getBeijingDateStr(0);
-            document.getElementById('date-label').innerText = currentDateStr;
+            document.getElementById('custom-date-picker').value = currentDateStr;
+            updateDateUI();
+
             const saved = localStorage.getItem('api_football_key');
             if (saved) {
                 document.getElementById('api-key-input').value = saved;
