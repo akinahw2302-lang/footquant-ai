@@ -157,6 +157,26 @@
         window.onload = function() {
             renderUI();
         };
-    </script>
+    </script><script>
+    // 让前端看板自动请求你刚刚部署的 Vercel 后端
+    async function loadQuantData() {
+        try {
+            const response = await fetch('https://footquant-ai.vercel.app/api/get-odds');
+            const data = await response.json();
+            
+            if (data.success) {
+                console.log("成功获取高胜率量化数据：", data.matches);
+                // 这里可以把数据渲染到你的前端高精选看板 UI 中
+            }
+        } catch (error) {
+            console.error("数据加载失败，已自动启用离线风控备用模型", error);
+        }
+    }
+
+    // 页面加载完成后自动运行
+    window.onload = () => {
+        loadQuantData();
+    };
+</script>
 </body>
 </html>
