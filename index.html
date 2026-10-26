@@ -180,7 +180,7 @@
                         <div class="flex items-center space-x-3">
                             <span class="font-mono font-bold text-amber-400 w-16">${m.id}</span>
                             <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300">[${m.league}]</span>
-                            <span class="font-bold text-slate-100">${m.home} vs${m.away}</span>
+                            <span class="font-bold text-slate-100">${m.home} vs ${m.away}</span>
                             <span class="px-2 py-0.5 rounded bg-slate-950 text-slate-400 border border-slate-800">${m.status}</span>
                         </div>
                         <div class="flex items-center flex-wrap gap-3 font-mono text-slate-300">
@@ -200,4 +200,62 @@
                 bannerEl.innerHTML = `
                     <section class="space-y-3">
                         <div class="flex justify-between items-center">
-                            <h2 class="text-sm font-bold text-slate-200 flex items
+                            <h2 class="text-sm font-bold text-slate-200 flex items-center gap-2">
+                                🔥 高风控精选 <span class="text-xs text-slate-400 font-normal">(含半全场 HT/FT 策略模型)</span>
+                            </h2>
+                            <span class="text-xs text-emerald-400 font-mono">风控原则: 严格过滤海爆冷温差场次</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            ${topMatches.map(m => `
+                                <div class="bg-slate-900 border border-slate-800 hover:border-amber-500/50 p-4 rounded-2xl transition space-y-3 shadow-lg">
+                                    <div class="flex justify-between items-center text-xs">
+                                        <span class="px-2 py-0.5 rounded bg-slate-800 text-amber-400 font-mono font-bold">${m.id} | 🏆 ${m.league} | ⏰ ${m.time}</span>
+                                        <span class="bg-emerald-950 text-emerald-400 border border-emerald-800 px-2 py-0.5 rounded font-bold font-mono">置信度 ${m.rate}%</span>
+                                    </div>
+                                    <div class="flex justify-between items-center py-1">
+                                        <span class="font-bold text-base text-slate-100">${m.home}</span>
+                                        <span class="text-xs font-black text-amber-500 px-3 py-1 bg-amber-500/10 rounded-lg">VS</span>
+                                        <span class="font-bold text-base text-slate-100">${m.away}</span>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-slate-800 font-mono">
+                                        <div>建议方向: <strong class="text-amber-400">${m.dir}</strong></div>
+                                        <div>半全场(HT/FT): <strong class="text-slate-200">${m.htft}</strong></div>
+                                    </div>
+                                    <div class="text-xs text-slate-300 font-mono flex items-center gap-1">
+                                        🎯 预测比分: <span class="text-emerald-400 font-bold">${m.score}</span>
+                                    </div>
+                                    <div class="text-xs text-slate-400 bg-slate-950 p-2.5 rounded-xl border border-slate-800/60 leading-relaxed">
+                                        💡 风控点评: ${m.comment}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </section>
+                `;
+
+                listContainer.innerHTML = dayData.matches.map(m => `
+                    <div class="p-3.5 flex flex-col md:flex-row justify-between items-start md:items-center gap-2 hover:bg-slate-800/40 transition text-xs">
+                        <div class="flex items-center space-x-3">
+                            <span class="font-mono font-bold text-amber-400 w-16">${m.id}</span>
+                            <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300">[${m.league}]</span>
+                            <span class="font-bold text-slate-100">${m.home} vs ${m.away}</span>
+                        </div>
+                        <div class="flex items-center flex-wrap gap-3 font-mono text-slate-300">
+                            <span class="text-amber-400 font-semibold">${m.dir}</span>
+                            <span class="text-slate-400">HT/FT: ${m.htft}</span>
+                            <span class="text-emerald-400 font-bold">🎯 ${m.score}</span>
+                            <span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800 font-bold">置信度 ${m.rate}%</span>
+                            <span class="text-slate-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">${m.time}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // 初始化加载今天
+        window.onload = () => {
+            switchDate('today');
+        };
+    </script>
+</body>
+</html>
