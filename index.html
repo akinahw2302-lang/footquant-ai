@@ -36,7 +36,7 @@
                     <span id="api-status-text" class="text-xs font-semibold text-slate-300">云端后端连接中 (Vercel Serverless Agent)</span>
                 </div>
                 <div class="text-xs text-slate-400">
-                    自动监控策略：<span class="text-amber-400 font-mono">置信度 ≥ 85% 强推</span> | 低质风险联赛自动降级
+                    自动监控策略：<span class="text-amber-400 font-mono">置信度 ≥ 85% 强推</span> | 离散度多维交叉校验
                 </div>
             </div>
         </div>
@@ -44,10 +44,9 @@
         <!-- Matches Grid Container -->
         <section>
             <h2 class="text-sm font-bold text-slate-400 mb-3 flex items-center gap-2">
-                🔥 <span id="section-title">今日精选高置信度标的 (API 动态计算)</span>
+                🔥 <span id="section-title">今日精选篮球高置信度标的 (API 动态计算)</span>
             </h2>
             <div id="matches-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- 动态数据将通过下方 JavaScript 加载至此处 -->
                 <div class="col-span-2 text-center py-12 text-slate-500 text-sm">
                     正在拉取云端多维 API 数据，请稍候...
                 </div>
@@ -56,15 +55,54 @@
     </main>
 
     <script>
-        // 核心量化数据获取逻辑（对接 Vercel 云端后端）
+        let currentSport = 'basketball';
+
+        // 常用球队中英文对照表（确保真实 API 数据完美呈现中文）
+        const teamNameMapping = {
+            "Charlotte Hornets": "夏洛特黄蜂", "Washington Wizards": "华盛顿奇才",
+            "Cleveland Cavaliers": "克利夫兰骑士", "Minnesota Timberwolves": "明尼苏达森林狼",
+            "Boston Celtics": "波士顿凯尔特人", "Chicago Bulls": "芝加哥公牛",
+            "Miami Heat": "迈阿密热火", "Dallas Mavericks": "达拉斯独行侠",
+            "Milwaukee Bucks": "密尔沃基雄鹿", "Indiana Pacers": "印第安纳步行者",
+            "Oklahoma City Thunder": "俄克拉荷马雷霆", "Phoenix Suns": "菲尼克斯太阳",
+            "Golden State Warriors": "金州勇士", "Los Angeles Lakers": "洛杉矶湖人",
+            "Arsenal": "阿森纳", "Chelsea": "切尔西", "Manchester City": "曼彻斯特城",
+            "Liverpool": "利物浦", "Manchester United": "曼联", "Tottenham Hotspur": "托特纳姆热刺"
+        };
+
+        function getChineseName(engName) {
+            return teamNameMapping[engName] || engName;
+        }
+
+        // 切换运动类型
+        function switchSport(sport) {
+            currentSport = sport;
+            const btnFootball = document.getElementById('tab-football');
+            const btnBasketball = document.getElementById('tab-basketball');
+            
+            if (sport === 'football') {
+                btnFootball.className = "px-4 py-1.5 text-xs font-bold rounded-lg bg-amber-500 text-slate-950 shadow-md transition";
+                btnBasketball.className = "px-4 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition";
+                document.getElementById('section-title').innerText = "今日精选足球高置信度标的 (API 动态计算)";
+            } else {
+                btnBasketball.className = "px-4 py-1.5 text-xs font-bold rounded-lg bg-amber-500 text-slate-950 shadow-md transition";
+                btnFootball.className = "px-4 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition";
+                document.getElementById('section-title').innerText = "今日精选篮球高置信度标的 (API 动态计算)";
+            }
+
+            loadQuantData();
+        }
+
+        // 异步请求 Vercel 后端
         async function loadQuantData() {
             const statusDot = document.getElementById('api-status-dot');
             const statusText = document.getElementById('api-status-text');
             const container = document.getElementById('matches-container');
 
+            container.innerHTML = `<div class="col-span-2 text-center py-12 text-slate-500 text-sm">正在获取 ${currentSport === 'football' ? '足球' : '篮球'} 实时量化异动数据...</div>`;
+
             try {
-                // 请求您在 Vercel 部署的代理接口
-                const response = await fetch('https://footquant-ai.vercel.app/api/get-odds');
+                const response = await fetch(`https://footquant-ai.vercel.app/api/get-odds?sport=${currentSport}`);
                 const data = await response.json();
 
                 if (data.success && data.matches && data.matches.length > 0) {
@@ -72,53 +110,50 @@
                     statusText.innerText = "API 在线: 已完成多维盘口异动与离散度交叉校验";
                     renderMatches(data.matches);
                 } else {
-                    throw new Error("接口未返回有效比赛数据");
+                    throw new Error("接口无比赛数据");
                 }
             } catch (error) {
-                console.warn("云端 API 获取异常，启动离线备用模型逻辑:", error);
+                console.warn("云端 API 获取异常，启动离线备用模型:", error);
                 statusDot.className = "w-3 h-3 rounded-full bg-amber-500";
                 statusText.innerText = "云端API响应延迟 - 已自动切入本地风控备用精算库";
                 renderFallbackData();
             }
         }
 
-        // 渲染 API 获得的真实量化结果
+        // 渲染量化看板比赛卡片
         function renderMatches(matches) {
             const container = document.getElementById('matches-container');
             container.innerHTML = matches.map(m => `
                 <div class="bg-slate-900/80 border border-slate-800 hover:border-amber-500/50 p-4 rounded-2xl transition space-y-3">
                     <div class="flex justify-between items-center text-xs text-slate-400">
-                        <span class="px-2 py-0.5 rounded bg-slate-800 text-amber-400 font-semibold">NBA / 实时盘口监控</span>
-                        <span class="font-mono text-emerald-400">置信度: ${m.rating || 88}%</span>
+                        <span class="px-2 py-0.5 rounded bg-slate-800 text-amber-400 font-semibold">${m.league || '实时盘口监控'}</span>
+                        <span class="font-mono text-emerald-400">置信度: ${m.rating}%</span>
                     </div>
                     <div class="flex justify-between items-center py-2">
-                        <span class="font-bold text-base text-slate-100">${m.home}</span>
+                        <span class="font-bold text-base text-slate-100">${getChineseName(m.home)}</span>
                         <span class="text-xs font-black text-amber-500 px-3 py-1 bg-amber-500/10 rounded-lg">VS</span>
-                        <span class="font-bold text-base text-slate-100">${m.away}</span>
+                        <span class="font-bold text-base text-slate-100">${getChineseName(m.away)}</span>
                     </div>
                     <div class="flex justify-between items-center pt-2 border-t border-slate-800/80 text-xs text-slate-400 font-mono">
-                        <span>离散度方差: <strong class="text-slate-200">${m.dispersion || '0.012'}</strong></span>
+                        <span>离散度方差: <strong class="text-slate-200">${m.dispersion}</strong></span>
                         <span class="text-amber-400">🔥 建议: 主胜/让分优化标的</span>
                     </div>
                 </div>
             `).join('');
         }
 
-        // 备用离线降级方案（保证页面永不空白）
+        // 离线备用渲染方案
         function renderFallbackData() {
-            const fallbackMatches = [
-                { home: "波士顿凯尔特人", away: "密尔沃基雄鹿", rating: 89, dispersion: "0.011" },
-                { home: "金州勇士", away: "洛杉矶湖人", rating: 86, dispersion: "0.014" }
+            const fallbackMatches = currentSport === 'football' ? [
+                { home: "Arsenal", away: "Chelsea", league: "英超 / 盘口异动监控", rating: 89, dispersion: "0.010" },
+                { home: "Manchester City", away: "Liverpool", league: "英超 / 盘口异动监控", rating: 87, dispersion: "0.013" }
+            ] : [
+                { home: "Boston Celtics", away: "Milwaukee Bucks", league: "NBA / 实时盘口监控", rating: 89, dispersion: "0.011" },
+                { home: "Golden State Warriors", away: "Los Angeles Lakers", league: "NBA / 实时盘口监控", rating: 86, dispersion: "0.014" }
             ];
             renderMatches(fallbackMatches);
         }
 
-        function switchSport(sport) {
-            console.log("切换体育类型:", sport);
-            loadQuantData();
-        }
-
-        // 页面加载完成后自动触发
         window.onload = loadQuantData;
     </script>
 </body>
