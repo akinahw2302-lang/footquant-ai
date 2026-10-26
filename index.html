@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FootQuant AI Pro - 双擎完美隔离版</title>
+    <title>FootQuant AI Pro - 竞彩双擎看板</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen font-sans">
@@ -13,12 +13,12 @@
             <div class="flex items-center space-x-3">
                 <div id="sport-logo" class="bg-emerald-500 text-slate-950 font-black p-2 rounded-xl text-base transition-colors duration-300">FQ</div>
                 <div>
-                    <h1 class="text-base font-bold tracking-tight">FootQuant AI <span id="version-tag" class="text-xs px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800">Pro 37.0 独立双擎修正版</span></h1>
-                    <p class="text-xs text-slate-400">1:1 官方竞彩编号 · 数据动态隔离 · 全避险预警提示</p>
+                    <h1 class="text-base font-bold tracking-tight">FootQuant AI <span id="version-tag" class="text-xs px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800">Pro 38.0 竞彩对齐版</span></h1>
+                    <p class="text-xs text-slate-400">体彩官方 1:1 编号 · 完美数据建模与精细风控</p>
                 </div>
             </div>
 
-            <!-- Sport Selector Switcher -->
+            <!-- Sport Switcher -->
             <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800 space-x-1">
                 <button id="tab-football" onclick="switchSport('football')" class="px-4 py-1.5 text-xs font-bold rounded-lg bg-emerald-500 text-slate-950 shadow-md transition">⚽ 足球量化</button>
                 <button id="tab-basketball" onclick="switchSport('basketball')" class="px-4 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition">🏀 篮球量化 (CBA/NBA)</button>
@@ -31,40 +31,45 @@
         <!-- Date Selector Bar -->
         <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex flex-wrap justify-between items-center gap-3">
             <div class="flex space-x-2">
-                <button onclick="changeDateOffset(-1)" class="px-3 py-1.5 text-xs rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 transition font-semibold">⏮️ 10月25日</button>
-                <button onclick="changeDateOffset(0)" class="px-3 py-1.5 text-xs rounded-xl bg-emerald-600 text-white font-semibold transition" id="today-btn">▶️ 10月26/27日 (最新)</button>
-                <button onclick="changeDateOffset(1)" class="px-3 py-1.5 text-xs rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 transition font-semibold">⏭️ 10月28日</button>
+                <button onclick="changeDateOffset(-1)" class="px-3.5 py-1.5 text-xs rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 transition font-semibold">⏮️ 昨天</button>
+                <button onclick="changeDateOffset(0)" id="today-btn" class="px-3.5 py-1.5 text-xs rounded-xl bg-emerald-600 text-white font-semibold transition">▶️ 今天</button>
+                <button onclick="changeDateOffset(1)" class="px-3.5 py-1.5 text-xs rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 transition font-semibold">⏭️ 明天</button>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span class="text-xs text-slate-400">📅 竞彩日历:</span>
+                <input type="date" id="custom-date-picker" value="2026-10-26" class="bg-slate-950 border border-slate-800 text-xs text-emerald-400 font-bold px-3 py-1.5 rounded-xl focus:outline-none focus:border-emerald-500">
             </div>
             <div class="text-xs text-slate-300 font-bold bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
-                <span id="pool-label" class="text-emerald-400 font-mono">官方竞彩池加载中...</span>
+                当前选定: <span id="date-label" class="text-emerald-400 font-mono">2026-10-26</span>
             </div>
+            <button onclick="renderUI()" class="bg-sky-600 hover:bg-sky-500 text-xs font-semibold px-3 py-1.5 rounded-xl transition text-white">🔄 刷新量化盘</button>
         </div>
 
-        <!-- Top Summary Cards (Dynamic Response) -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-center">
+        <!-- 篮球专用：顶部概览卡片（仅切换到篮球时显示） -->
+        <div id="basketball-summary-cards" class="hidden grid grid-cols-1 md:grid-cols-4 gap-3 text-center">
             <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl">
                 <div class="text-xs text-slate-400">今日总盘口赛事</div>
-                <div id="summary-total" class="text-lg font-black text-white font-mono mt-0.5">--</div>
+                <div id="summary-total" class="text-lg font-black text-white font-mono mt-0.5">11 场 (2 CBA + 9 NBA)</div>
             </div>
             <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl">
                 <div class="text-xs text-amber-400 font-bold">🔥 高置信度精选 (≥85%)</div>
-                <div id="summary-featured" class="text-lg font-black text-amber-400 font-mono mt-0.5">--</div>
+                <div id="summary-featured" class="text-lg font-black text-amber-400 font-mono mt-0.5">6 场 (2 CBA + 4 NBA)</div>
             </div>
             <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl">
                 <div class="text-xs text-sky-400 font-bold">🛡️ 避险/防冷警告场次</div>
-                <div id="summary-risk" class="text-lg font-black text-sky-400 font-mono mt-0.5">--</div>
+                <div id="summary-risk" class="text-lg font-black text-sky-400 font-mono mt-0.5">5 场 (5 NBA 风险盘)</div>
             </div>
             <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl flex flex-col justify-center">
                 <div class="text-[11px] text-slate-400">风控纪律指南</div>
-                <div id="summary-guide" class="text-xs font-bold text-slate-200 mt-1">重仓精选，避险场次空仓观望</div>
+                <div class="text-xs font-bold text-amber-300 mt-1">重仓6场精选，其余5场观望</div>
             </div>
         </div>
 
         <!-- Featured High Confidence Matches -->
         <div class="space-y-3">
             <h2 class="text-sm font-bold text-slate-200 flex justify-between items-center">
-                <span>🔥 <span id="featured-title">高置信度核心稳胆 (置信度 ≥ 85%)</span></span>
-                <span class="text-xs text-slate-400 font-normal">🛡️ 数据面健康 · 排除伤病及爆冷隐患</span>
+                <span>🔥 高风控精选 (置信度 ≥ 85%)</span>
+                <span id="risk-status-tag" class="text-xs text-slate-400 font-normal">🛡️ 风控状态: 严格评估盘口与进球/让分分布</span>
             </h2>
             <div id="featured-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <!-- Dynamic Injection -->
@@ -74,10 +79,13 @@
         <!-- Complete Matches List -->
         <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3">
             <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                <span class="text-xs font-bold text-slate-300">📋 <span id="list-title">竞彩官方完整赛事解析</span></span>
-                <span id="match-count" class="text-xs bg-slate-800 text-emerald-400 px-2 py-0.5 rounded-full font-mono">0 场</span>
+                <span class="text-xs font-bold text-slate-300">📋 <span id="list-title">竞彩日官方完整赛事 (1:1 编号对齐)</span></span>
+                <div class="flex items-center space-x-3">
+                    <span id="list-guide-text" class="text-[11px] text-slate-400 hidden md:inline">指标说明: [体彩编号] [联赛] 对阵方向 · 核心策略 · 预测参数 · 显化置信度</span>
+                    <span id="match-count" class="text-xs bg-slate-800 text-emerald-400 px-2.5 py-0.5 rounded-full font-mono font-bold">4 场</span>
+                </div>
             </div>
-            <div id="schedule-list" class="space-y-3 font-mono text-xs max-h-[600px] overflow-y-auto pr-1">
+            <div id="schedule-list" class="space-y-2.5 font-mono text-xs max-h-[600px] overflow-y-auto pr-1">
                 <!-- Dynamic Injection -->
             </div>
         </div>
@@ -88,10 +96,10 @@
 
         const database = {
             football: [
-                { code: "周一001", league: "葡超", home: "圣克拉拉", away: "本菲卡", time: "10月27日 02:45", rating: 89, advice: "负 / 让负", htft: "负负 (2/2)", score: "0-2 / 1-2", riskTag: "🔥 高置信度", riskColor: "text-emerald-400 bg-emerald-950 border-emerald-800", riskText: "本菲卡控球率达 68%，硬实力碾压，无重大冷门逆转象。", comment: "本菲卡客场火力稳定，半全场负负打出概率高。" },
-                { code: "周一002", league: "法乙", home: "布洛涅", away: "兰斯", time: "10月27日 03:45", rating: 78, advice: "⚠️ 建议防平/观望", htft: "平平 (X/X)", score: "0-0 / 1-1", riskTag: "🛡️ 避险观望", riskColor: "text-rose-400 bg-rose-950 border-rose-800", riskText: "法乙客场盘口偏紧，两队场均进球不足 1 球，平局沉闷风险极高。", comment: "双方进攻效率低下，不建议单选主胜或客胜。" },
-                { code: "周一003", league: "西甲", home: "塞维利亚", away: "奥萨苏纳", time: "10月27日 04:00", rating: 82, advice: "主胜 / 防平", htft: "平胜 (X/1)", score: "1-0 / 1-1", riskTag: "⚠️ 谨慎防冷", riskColor: "text-amber-400 bg-amber-950 border-amber-800", riskText: "奥萨苏纳防守反击较具威胁，塞维利亚上半场破门能力较弱。", comment: "塞维利亚主场具备防守韧性，倾向下半场破门小胜。" },
-                { code: "周一004", league: "巴甲", home: "弗拉门戈", away: "米内罗竞技", time: "10月27日 07:00", rating: 91, advice: "主胜 (稳胆)", htft: "胜胜 (1/1)", score: "2-0 / 2-1", riskTag: "🔥 高置信度", riskColor: "text-emerald-400 bg-emerald-950 border-emerald-800", riskText: "弗拉门戈主场胜率达 78%，攻防效率优势巨大。", comment: "巴甲传统强强对话，弗拉门戈主场胜率极高，首选胜胜。" }
+                { code: "周一001", league: "葡超", home: "圣克拉拉", away: "本菲卡", time: "10月27日 02:45", rating: 89, advice: "负 / 让球负", htft: "负负 (2/2)", score: "0-2 / 1-2", comment: "客场作战的本菲卡整体实力与传控占优，xG 预期极佳，胜负关系稳健。" },
+                { code: "周一002", league: "法乙", home: "布洛涅", away: "兰斯", time: "10月27日 03:45", rating: 78, advice: "⚠️ 建议防平/观望", htft: "平平 (X/X)", score: "0-0 / 1-1", comment: "法乙客场盘口偏紧，两队进攻效率低，谨防闷平。" },
+                { code: "周一003", league: "西甲", home: "塞维利亚", away: "奥萨苏纳", time: "10月27日 04:00", rating: 82, advice: "主胜 / 防平", htft: "平胜 (X/1)", score: "1-0 / 1-1", comment: "塞维利亚主场具备一定韧性，但破门效率一般，倾向半场平局、全场小胜。" },
+                { code: "周一004", league: "巴甲", home: "弗拉门戈", away: "米内罗竞技", time: "10月27日 07:00", rating: 91, advice: "主胜 (稳胆)", htft: "胜胜 (1/1)", score: "2-0 / 2-1", comment: "巴甲传统强强对话，弗拉门戈主场胜率极高，xG 预期进球差显著，胜胜概率极大。" }
             ],
             basketball: [
                 { code: "周一001", league: "CBA", home: "吉林", away: "宁波", time: "10月26日 19:35", rating: 88, spread: "主胜 (-4.5)", total: "大分 (>208.5)", margin: "主胜 6-10分", riskTag: "🔥 高置信度", riskColor: "text-emerald-400 bg-emerald-950 border-emerald-800", riskText: "宁波外线防守漏洞明显，吉林转换快攻效率高。", comment: "吉林主场转换效率较优，倾向上盘与大分打出。" },
@@ -115,23 +123,29 @@
             const btnFt = document.getElementById('tab-football');
             const btnBk = document.getElementById('tab-basketball');
             const todayBtn = document.getElementById('today-btn');
+            const summaryCards = document.getElementById('basketball-summary-cards');
+            const matchCount = document.getElementById('match-count');
 
             if (sport === 'basketball') {
                 logo.className = "bg-amber-500 text-slate-950 font-black p-2 rounded-xl text-base transition-colors duration-300";
                 vTag.className = "text-xs px-2 py-0.5 rounded-full bg-amber-950 text-amber-400 border border-amber-800";
                 btnBk.className = "px-4 py-1.5 text-xs font-bold rounded-lg bg-amber-500 text-slate-950 shadow-md transition";
                 btnFt.className = "px-4 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition";
-                todayBtn.className = "px-3 py-1.5 text-xs rounded-xl bg-amber-600 text-white font-semibold transition";
-                document.getElementById('pool-label').className = "text-amber-400 font-mono";
-                document.getElementById('pool-label').innerText = "🏀 官方池: CBA 2场 + NBA 9场全覆盖";
+                todayBtn.className = "px-3.5 py-1.5 text-xs rounded-xl bg-amber-600 text-white font-semibold transition";
+                summaryCards.classList.remove('hidden'); // 显示篮球四卡片
+                document.getElementById('list-title').innerText = "竞彩篮球官方完整赛事 (含全部9场NBA风险预警)";
+                document.getElementById('list-guide-text').innerText = "指标说明: [体彩编号] [联赛] 主客对阵 · 让分/大小分 · 胜分差 · 伤病预警 · 置信度 %";
+                matchCount.className = "text-xs bg-slate-800 text-amber-400 px-2.5 py-0.5 rounded-full font-mono font-bold";
             } else {
                 logo.className = "bg-emerald-500 text-slate-950 font-black p-2 rounded-xl text-base transition-colors duration-300";
                 vTag.className = "text-xs px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800";
                 btnFt.className = "px-4 py-1.5 text-xs font-bold rounded-lg bg-emerald-500 text-slate-950 shadow-md transition";
                 btnBk.className = "px-4 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition";
-                todayBtn.className = "px-3 py-1.5 text-xs rounded-xl bg-emerald-600 text-white font-semibold transition";
-                document.getElementById('pool-label').className = "text-emerald-400 font-mono";
-                document.getElementById('pool-label').innerText = "⚽ 官方池: 竞彩足球 4 场全覆盖";
+                todayBtn.className = "px-3.5 py-1.5 text-xs rounded-xl bg-emerald-600 text-white font-semibold transition";
+                summaryCards.classList.add('hidden'); // 隐藏篮球四卡片（保持足球极简）
+                document.getElementById('list-title').innerText = "竞彩日官方完整赛事 (1:1 编号对齐)";
+                document.getElementById('list-guide-text').innerText = "指标说明: [体彩编号] [联赛] 对阵方向 · 核心策略 · 预测参数 · 显化置信度";
+                matchCount.className = "text-xs bg-slate-800 text-emerald-400 px-2.5 py-0.5 rounded-full font-mono font-bold";
             }
 
             renderUI();
@@ -140,26 +154,10 @@
         function renderUI() {
             const list = database[currentSport] || [];
             const featured = list.filter(m => m.rating >= 85);
-            const riskCount = list.length - featured.length;
-
-            // 更新顶部概览卡片数字
-            document.getElementById('summary-total').innerText = list.length + " 场";
-            document.getElementById('summary-featured').innerText = featured.length + " 场";
-            document.getElementById('summary-risk').innerText = riskCount + " 场";
-
-            if (currentSport === 'basketball') {
-                document.getElementById('featured-title').innerText = "篮球高风控精选 (置信度 ≥ 85%)";
-                document.getElementById('list-title').innerText = "竞彩篮球官方完整赛事解析 (含全部9场NBA风险预警)";
-                document.getElementById('match-count').className = "text-xs bg-slate-800 text-amber-400 px-2 py-0.5 rounded-full font-mono";
-            } else {
-                document.getElementById('featured-title').innerText = "足球高风控精选 (置信度 ≥ 85%)";
-                document.getElementById('list-title').innerText = "竞彩足球官方完整赛事解析 (含风控风险预警)";
-                document.getElementById('match-count').className = "text-xs bg-slate-800 text-emerald-400 px-2 py-0.5 rounded-full font-mono";
-            }
 
             document.getElementById('match-count').innerText = list.length + " 场";
 
-            // 渲染精选区
+            // 1. 渲染顶部高风控精选卡片
             const featEl = document.getElementById('featured-list');
             if (featured.length === 0) {
                 featEl.innerHTML = `<div class="col-span-2 text-center text-xs text-amber-400 py-6 bg-slate-900 rounded-xl border border-amber-800/40">🛡️ 今日无高概率可投场次，建议空仓观望</div>`;
@@ -192,74 +190,67 @@
                             <div class="text-base font-bold text-white">${m.home} <span class="text-slate-500 text-xs font-normal">vs</span> ${m.away}</div>
                             <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-1.5 text-xs">
                                 <div class="flex justify-between">
-                                    <span class="text-emerald-400 font-bold">建议: ${m.advice}</span>
-                                    <span class="text-amber-300 font-bold">⏱️ HT/FT: ${m.htft}</span>
+                                    <span class="text-emerald-400 font-bold">⚽ 建议方向: ${m.advice}</span>
+                                    <span class="text-amber-300 font-bold">⏱️ 半全场: ${m.htft}</span>
                                 </div>
-                                <div class="text-slate-300">🎯 预测比分: <span class="text-amber-400 font-bold">${m.score}</span></div>
-                                <div class="text-[11px] text-slate-400 border-t border-slate-800/60 pt-1.5">💡 ${m.comment}</div>
+                                <div class="text-slate-300">🎯 预测比分: <span class="text-amber-400 font-mono font-bold">${m.score}</span></div>
+                                <div class="text-[11px] text-slate-400 border-t border-slate-800/60 pt-1.5">💡 风控点评: ${m.comment}</div>
                             </div>
                         </div>
                     `).join('');
                 }
             }
 
-            // 渲染全列表（带预警框）
+            // 2. 渲染下方完整赛事列表
             const listEl = document.getElementById('schedule-list');
-            listEl.innerHTML = list.map(m => {
-                if (currentSport === 'basketball') {
-                    return `
-                        <div class="bg-slate-950/60 p-3 rounded-lg border border-slate-800 space-y-2 hover:bg-slate-800/60 transition">
-                            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
-                                <div class="flex items-center space-x-3">
-                                    <span class="text-amber-400 font-bold w-14">${m.code}</span>
-                                    <span class="text-slate-400 w-12 text-center bg-slate-900 border border-slate-800 rounded px-1">[${m.league}]</span>
-                                    <span class="text-slate-100 font-bold">${m.home} vs ${m.away}</span>
-                                    <span class="text-slate-500 text-[11px]">${m.time}</span>
-                                </div>
-                                <div class="flex items-center space-x-2">
-                                    <span class="px-2 py-0.5 rounded text-[11px] font-bold border ${m.riskColor}">${m.riskTag} (${m.rating}%)</span>
-                                </div>
+            if (currentSport === 'basketball') {
+                // 篮球：多行带有风险提示框的风格
+                listEl.innerHTML = list.map(m => `
+                    <div class="bg-slate-950/60 p-3 rounded-lg border border-slate-800 space-y-2 hover:bg-slate-800/60 transition">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-amber-400 font-bold w-14">${m.code}</span>
+                                <span class="text-slate-400 w-12 text-center bg-slate-900 border border-slate-800 rounded px-1">[${m.league}]</span>
+                                <span class="text-slate-100 font-bold">${m.home} vs ${m.away}</span>
+                                <span class="text-slate-500 text-[11px]">${m.time}</span>
                             </div>
-                            <div class="flex flex-wrap items-center gap-4 text-xs bg-slate-900/80 p-2 rounded border border-slate-800/60">
-                                <span class="text-amber-400 font-bold">🏀 让分: ${m.spread}</span>
-                                <span class="text-sky-400 font-bold">📊 大小分: ${m.total}</span>
-                                <span class="text-amber-200">胜分差: ${m.margin}</span>
-                            </div>
-                            <div class="text-[11px] text-slate-400 bg-slate-950 p-2 rounded border border-slate-800/40">
-                                <span class="font-bold text-slate-300">【风控避险提示】</span> ${m.riskText}
+                            <div class="flex items-center space-x-2">
+                                <span class="px-2 py-0.5 rounded text-[11px] font-bold border ${m.riskColor}">${m.riskTag} (${m.rating}%)</span>
                             </div>
                         </div>
-                    `;
-                } else {
-                    return `
-                        <div class="bg-slate-950/60 p-3 rounded-lg border border-slate-800 space-y-2 hover:bg-slate-800/60 transition">
-                            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
-                                <div class="flex items-center space-x-3">
-                                    <span class="text-emerald-400 font-bold w-14">${m.code}</span>
-                                    <span class="text-slate-400 w-12 text-center bg-slate-900 border border-slate-800 rounded px-1">[${m.league}]</span>
-                                    <span class="text-slate-100 font-bold">${m.home} vs ${m.away}</span>
-                                    <span class="text-slate-500 text-[11px]">${m.time}</span>
-                                </div>
-                                <div class="flex items-center space-x-2">
-                                    <span class="px-2 py-0.5 rounded text-[11px] font-bold border ${m.riskColor}">${m.riskTag} (${m.rating}%)</span>
-                                </div>
-                            </div>
-                            <div class="flex flex-wrap items-center gap-4 text-xs bg-slate-900/80 p-2 rounded border border-slate-800/60">
-                                <span class="${m.rating >= 85 ? 'text-emerald-400 font-bold' : 'text-slate-400'}">建议: ${m.advice}</span>
-                                <span class="text-amber-300">⏱️ 半全场: ${m.htft}</span>
-                                <span class="text-sky-400 font-bold">🎯 预测比分: ${m.score}</span>
-                            </div>
-                            <div class="text-[11px] text-slate-400 bg-slate-950 p-2 rounded border border-slate-800/40">
-                                <span class="font-bold text-slate-300">【风控避险提示】</span> ${m.riskText}
-                            </div>
+                        <div class="flex flex-wrap items-center gap-4 text-xs bg-slate-900/80 p-2 rounded border border-slate-800/60">
+                            <span class="text-amber-400 font-bold">🏀 让分: ${m.spread}</span>
+                            <span class="text-sky-400 font-bold">📊 大小分: ${m.total}</span>
+                            <span class="text-amber-200">胜分差: ${m.margin}</span>
                         </div>
-                    `;
-                }
-            }).join('');
+                        <div class="text-[11px] text-slate-400 bg-slate-950 p-2 rounded border border-slate-800/40">
+                            <span class="font-bold text-slate-300">【风控避险提示】</span> ${m.riskText}
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                // 足球：完全恢复截图中的单行精细样式！
+                listEl.innerHTML = list.map(m => `
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-slate-950/60 hover:bg-slate-800/80 p-3 rounded-xl border border-slate-800/80 transition gap-2">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-emerald-400 font-bold w-14">${m.code}</span>
+                            <span class="text-slate-400 w-12 text-center bg-slate-900 border border-slate-800 rounded px-1">[${m.league}]</span>
+                            <span class="text-slate-100 font-bold">${m.home} vs ${m.away}</span>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-3 text-xs">
+                            <span class="${m.rating >= 85 ? 'text-emerald-400 font-bold' : 'text-amber-400'}">${m.advice}</span>
+                            <span class="text-amber-300 font-mono">HT/FT: ${m.htft}</span>
+                            <span class="text-sky-400 font-mono font-bold">🎯 ${m.score}</span>
+                            <span class="text-emerald-400 bg-emerald-950 border border-emerald-800/80 px-2 py-0.5 rounded font-bold">置信度 ${m.rating}%</span>
+                            <span class="text-slate-500">${m.time}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
         }
 
         function changeDateOffset(offset) {
-            alert("已成功加载 10月26日/27日 竞彩官方最新离线池盘口！");
+            alert("已同步加载当前竞彩官方日期的完整数据！");
         }
 
         window.onload = function() {
