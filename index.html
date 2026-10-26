@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FootQuant AI Pro - 官方竞彩对齐与离线风控版</title>
+    <title>FootQuant AI Pro - 官方赛事完整数据对齐版</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen font-sans">
@@ -13,8 +13,8 @@
             <div class="flex items-center space-x-3">
                 <div class="bg-emerald-500 p-2 rounded-xl text-slate-950 font-bold">FQ</div>
                 <div>
-                    <h1 class="text-base font-bold tracking-tight">FootQuant AI <span class="text-emerald-400 text-xs px-2 py-0.5 bg-emerald-950 border border-emerald-800 rounded-full">Pro 31.0 官方赛程对齐版</span></h1>
-                    <p class="text-xs text-slate-400">体彩官方 1:1 编号 · 半全场 (HT/FT) 量化分析 · 严苛风控引擎</p>
+                    <h1 class="text-base font-bold tracking-tight">FootQuant AI <span class="text-emerald-400 text-xs px-2 py-0.5 bg-emerald-950 border border-emerald-800 rounded-full">Pro 32.0 完整看板版</span></h1>
+                    <p class="text-xs text-slate-400">体彩官方 1:1 编号 · 全列表比分与置信度同步显示</p>
                 </div>
             </div>
             <div class="flex items-center space-x-2">
@@ -55,10 +55,10 @@
         <!-- Full Schedule -->
         <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3">
             <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                <span class="text-xs font-bold text-slate-300">📋 竞彩日官方完整赛事（严格对齐体彩编号）</span>
+                <span class="text-xs font-bold text-slate-300">📋 竞彩日官方完整赛事（含比分与命中率预估）</span>
                 <span id="match-count" class="text-xs bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full">0 场</span>
             </div>
-            <div id="schedule-list" class="space-y-2 font-mono text-xs max-h-[500px] overflow-y-auto pr-1">
+            <div id="schedule-list" class="space-y-2 font-mono text-xs max-h-[550px] overflow-y-auto pr-1">
                 <!-- Dynamic Injection -->
             </div>
         </div>
@@ -67,7 +67,6 @@
     <script>
         let currentDateStr = "";
 
-        // 严格对齐体彩官方真实编号与赛程的离线数据库
         const mockDatabase = {
             "2026-10-26": [
                 { code: "周一001", league: "葡超", home: "圣克拉拉", away: "本菲卡", time: "10月27日 02:45", rating: 89, advice: "负 / 让球负", htft: "负负 (2/2)", score: "0-2 / 1-2", comment: "客场作战的本菲卡整体实力占优，传控压制力强，倾向客胜与胜负关系稳健。" },
@@ -111,8 +110,6 @@
 
         function loadSchedule() {
             const matches = mockDatabase[currentDateStr] || [];
-            
-            // 筛选高置信度场次 (Rating >= 85)
             const featured = matches.filter(m => m.rating >= 85);
 
             const featEl = document.getElementById('featured-list');
@@ -150,17 +147,20 @@
                 return;
             }
 
+            // 完整赛事列表同步增加预测比分与置信度展示
             listEl.innerHTML = matches.map(m => `
-                <div class="flex justify-between items-center bg-slate-950/60 hover:bg-slate-800/80 p-3 rounded-lg border border-slate-800/80 transition">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-slate-950/60 hover:bg-slate-800/80 p-3 rounded-lg border border-slate-800/80 transition gap-2">
                     <div class="flex items-center space-x-3">
                         <span class="text-emerald-400 font-bold w-14">${m.code}</span>
                         <span class="text-slate-400 w-14 text-center bg-slate-900 border border-slate-800 rounded px-1">[${m.league}]</span>
                         <span class="text-slate-100 font-bold">${m.home} vs ${m.away}</span>
                     </div>
-                    <div class="flex items-center space-x-4">
-                        <span class="text-xs ${m.rating >= 85 ? 'text-emerald-400 font-bold' : 'text-slate-400'}">${m.advice}</span>
-                        <span class="text-amber-300 text-xs font-mono font-bold">HT/FT: ${m.htft}</span>
-                        <span class="text-slate-500 text-xs">${m.time}</span>
+                    <div class="flex flex-wrap items-center gap-3 text-xs">
+                        <span class="${m.rating >= 85 ? 'text-emerald-400 font-bold' : 'text-slate-400'}">${m.advice}</span>
+                        <span class="text-amber-300 font-mono">HT/FT: ${m.htft}</span>
+                        <span class="text-sky-400 font-mono font-bold">🎯 ${m.score}</span>
+                        <span class="text-emerald-300 bg-emerald-950/60 border border-emerald-800/50 px-2 py-0.5 rounded font-bold">置信度 ${m.rating}%</span>
+                        <span class="text-slate-500">${m.time}</span>
                     </div>
                 </div>
             `).join('');
