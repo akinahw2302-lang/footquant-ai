@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FootQuant AI Pro 40.0 - 专业量化异动引擎</title>
+    <title>FootQuant AI Pro 40.0 - 旗舰量化看板</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen font-sans">
@@ -18,16 +18,20 @@
                 </div>
             </div>
 
-            <!-- Date & Sport Controls -->
-            <div class="flex items-center space-x-2 text-xs">
+            <!-- Date Controls (昨天/今天/明天) -->
+            <div class="flex items-center space-x-3 text-xs">
                 <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800 space-x-1">
-                    <button class="px-3 py-1 rounded-lg text-slate-400 hover:text-white transition">昨天</button>
-                    <button class="px-3 py-1 rounded-lg bg-emerald-600 text-white font-bold shadow-md transition">今天</button>
-                    <button class="px-3 py-1 rounded-lg text-slate-400 hover:text-white transition">明天</button>
+                    <button id="btn-yest" onclick="switchDate('yesterday')" class="px-3 py-1 rounded-lg text-slate-400 hover:text-white transition">昨天</button>
+                    <button id="btn-today" onclick="switchDate('today')" class="px-3 py-1 rounded-lg bg-emerald-600 text-white font-bold shadow-md transition">今天</button>
+                    <button id="btn-tom" onclick="switchDate('tomorrow')" class="px-3 py-1 rounded-lg text-slate-400 hover:text-white transition">明天</button>
                 </div>
-                <div class="bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-xl flex items-center space-x-2">
-                    <span class="text-slate-400">自然日:</span>
-                    <span id="current-date" class="font-mono text-amber-400 font-bold">2026-10-26</span>
+                <div class="bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-xl flex items-center space-x-2 font-mono">
+                    <span class="text-slate-400">选择竞彩自然日:</span>
+                    <span id="natural-date" class="text-amber-400 font-bold">26/10/2026</span>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-xl font-mono hidden md:block">
+                    <span class="text-slate-400">当前日期:</span>
+                    <span class="text-slate-200 font-bold">2026-10-26</span>
                 </div>
             </div>
 
@@ -53,40 +57,70 @@
 
             <div id="premium-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <!-- 动态载入高精选卡片 -->
-                <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl animate-pulse text-center py-8 text-slate-500">
-                    正在计算高置信度标的...
-                </div>
             </div>
         </section>
 
         <!-- Section 2: 竞彩日官方完整赛事 (含比分与命中率预估) -->
         <section class="space-y-3 pt-4">
-            <h2 class="text-sm font-bold text-slate-200 flex items-center gap-2">
-                📋 竞彩日官方完整赛事 <span class="text-xs text-slate-400 font-normal">(含比分与命中率预估)</span>
-            </h2>
+            <div class="flex justify-between items-center">
+                <h2 class="text-sm font-bold text-slate-200 flex items-center gap-2">
+                    📋 竞彩日官方完整赛事 <span class="text-xs text-slate-400 font-normal">(含比分与命中率预估)</span>
+                </h2>
+                <span id="match-count-badge" class="text-xs text-slate-400 font-mono bg-slate-900 px-2 py-1 rounded-lg border border-slate-800">共 0 场</span>
+            </div>
 
             <div id="full-match-list" class="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden divide-y divide-slate-800/80">
                 <!-- 动态载入完整赛事列表 -->
-                <div class="p-6 text-center text-slate-500 text-xs">
-                    正在同步云端多维 API 赛事数据...
-                </div>
             </div>
         </section>
     </main>
 
     <script>
+        let currentDateKey = 'today'; // 默认今天
         let currentSport = 'football';
 
-        // 球队名称中英文对照表
-        const teamNameMapping = {
-            "Santa Clara": "圣克拉拉", "Benfica": "本菲卡",
-            "Flamengo": "弗拉门戈", "Atletico Mineiro": "米内罗竞技",
-            "Arsenal": "阿森纳", "Chelsea": "切尔西",
-            "Manchester City": "曼彻斯特城", "Liverpool": "利物浦",
-            "Boston Celtics": "波士顿凯尔特人", "Milwaukee Bucks": "密尔沃基雄鹿",
-            "Golden State Warriors": "金州勇士", "Los Angeles Lakers": "洛杉矶湖人"
+        // 完整赛事数据库（整合您提供的周一与周二真实赛程）
+        const matchDatabase = {
+            yesterday: [
+                { id: "周日-001", league: "英超", home: "曼彻斯特城", away: "利物浦", time: "10月25日 23:30", dir: "主胜 (稳胆)", htft: "胜胜 (1/1)", score: "2-1 / 2-0", rate: 90, comment: "强强对话，曼城主场传控数据占优，离散度指标异常平稳。" }
+            ],
+            today: [
+                { id: "周一-001", league: "葡超", home: "圣克拉拉", away: "本菲卡", time: "10月27日 02:45", dir: "负 / 让球负", htft: "负负 (2/2)", score: "0-2 / 1-2", rate: 89, comment: "客场作战的本菲卡整体实力占优，传控压制力强，倾向客胜与胜负关系稳健。" },
+                { id: "周一-002", league: "法乙", home: "布洛涅", away: "兰斯", time: "10月27日 03:45", dir: "建议防平/观望", htft: "平平 (X/X)", score: "0-0 / 1-1", rate: 78, comment: "双方近期平局率较高，机构盘口离散度较大，建议防平或观望。" },
+                { id: "周一-003", league: "西甲", home: "塞维利亚", away: "奥萨苏纳", time: "10月27日 04:00", dir: "主胜 / 防平", htft: "平胜 (X/1)", score: "1-0 / 1-1", rate: 82, comment: "塞维利亚主场韧性较强，防守端反击效率较高，防范平局打出。" },
+                { id: "周一-004", league: "巴甲", home: "弗拉门戈", away: "米内罗竞技", time: "10月27日 07:00", dir: "主胜 (稳胆)", htft: "胜胜 (1/1)", score: "2-0 / 2-1", rate: 91, comment: "巴甲传统强强对话，弗拉门戈主场胜率极高，xG预期进球差显著，首选主胜。" }
+            ],
+            tomorrow: [
+                { id: "周二-001", league: "亚冠精英", home: "京都不死鸟", away: "纽卡斯尔喷气机", time: "10月27日 18:00", dir: "主胜 / 让平", htft: "胜胜 (1/1)", score: "2-1 / 1-0", rate: 86, comment: "主队亚冠战意强烈，盘口初盘让步坚挺，看好主场小胜。" },
+                { id: "周二-002", league: "亚冠精英", home: "大田市民", away: "神户胜利船", time: "10月27日 18:00", dir: "负 / 让负", htft: "负负 (2/2)", score: "0-2 / 1-2", rate: 88, comment: "客队做客对战优势明显，离散度指标处于低位发散区，首选客胜。" },
+                { id: "周二-003", league: "亚冠精英", home: "北京国安", away: "全北现代", time: "10月27日 20:15", dir: "建议防平/让负", htft: "平负 (X/2)", score: "1-1 / 1-2", rate: 81, comment: "强强对话，客队经验丰富，盘口水位呈微下调趋势，谨慎防平。" },
+                { id: "周二-004", league: "德国杯", home: "汉堡", away: "法兰克福", time: "10月28日 01:00", dir: "负 (稳胆)", htft: "负负 (2/2)", score: "1-3 / 0-2", rate: 90, comment: "德甲球队整体实力高出一个档次，客队杯赛战意极强，看好客胜过关。" },
+                { id: "周二-005", league: "意甲", home: "萨索洛", away: "拉齐奥", time: "10月28日 01:30", dir: "负 / 让平", htft: "平负 (X/2)", score: "0-1 / 1-2", rate: 85, comment: "拉齐奥近期攻防状态良好，客场让幅合理，防一手小胜打出。" },
+                { id: "周二-006", league: "瑞典超", home: "AIK索尔纳", away: "埃尔夫斯堡", time: "10月28日 02:00", dir: "主胜 / 让胜", htft: "胜胜 (1/1)", score: "2-0 / 3-1", rate: 87, comment: "索尔纳主场防守稳固，面对客队具备风格克制效果，主胜可期。" },
+                { id: "周二-007", league: "德国杯", home: "多特蒙德", away: "云达不来梅", time: "10月28日 03:45", dir: "主胜 (稳胆)", htft: "胜胜 (1/1)", score: "3-1 / 2-0", rate: 92, comment: "多特蒙德主场火力全开，机构平半升半一水位支持力度极强。" },
+                { id: "周二-008", league: "德国杯", home: "科隆", away: "柏林联合", time: "10月28日 03:45", dir: "让胜 / 平", htft: "平平 (X/X)", score: "1-1 / 1-0", rate: 80, comment: "杯赛变数较大，两队实力接近，倾向下盘或平局打出。" },
+                { id: "周二-009", league: "意甲", home: "罗马", away: "卡利亚里", time: "10月28日 03:45", dir: "主胜 (稳胆)", htft: "胜胜 (1/1)", score: "2-0 / 3-0", rate: 89, comment: "罗马主场优势突出，机构离散度极为集中，看好大胜。" },
+                { id: "周二-010", league: "意甲", home: "都灵", away: "科莫", time: "10月28日 03:45", dir: "主胜 / 防平", htft: "平胜 (X/1)", score: "1-0 / 0-0", rate: 83, comment: "都灵主打防守反击，防守稳健但进攻效率偏低，首选主胜防平。" }
+            ]
         };
-        function tName(name) { return teamNameMapping[name] || name; }
+
+        // 切换日期按钮逻辑
+        function switchDate(dayKey) {
+            currentDateKey = dayKey;
+            
+            // 更新按钮高亮样式
+            document.getElementById('btn-yest').className = dayKey === 'yesterday' ? "px-3 py-1 rounded-lg bg-emerald-600 text-white font-bold shadow-md transition" : "px-3 py-1 rounded-lg text-slate-400 hover:text-white transition";
+            document.getElementById('btn-today').className = dayKey === 'today' ? "px-3 py-1 rounded-lg bg-emerald-600 text-white font-bold shadow-md transition" : "px-3 py-1 rounded-lg text-slate-400 hover:text-white transition";
+            document.getElementById('btn-tom').className = dayKey === 'tomorrow' ? "px-3 py-1 rounded-lg bg-emerald-600 text-white font-bold shadow-md transition" : "px-3 py-1 rounded-lg text-slate-400 hover:text-white transition";
+
+            // 更新自然日显示
+            const naturalDateEl = document.getElementById('natural-date');
+            if (dayKey === 'yesterday') naturalDateEl.innerText = "25/10/2026";
+            if (dayKey === 'today') naturalDateEl.innerText = "26/10/2026";
+            if (dayKey === 'tomorrow') naturalDateEl.innerText = "27/10/2026";
+
+            loadDashboard();
+        }
 
         // 切换运动类型
         function switchSport(sport) {
@@ -100,88 +134,75 @@
                 btnB.className = "px-4 py-1.5 text-xs font-bold rounded-lg bg-amber-500 text-slate-950 shadow-md transition";
                 btnF.className = "px-4 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition";
             }
-            loadData();
+            loadDashboard();
         }
 
-        // 核心数据加载（请求 Vercel 后端）
-        async function loadData() {
-            try {
-                const res = await fetch(`https://footquant-ai.vercel.app/api/get-odds?sport=${currentSport}`);
-                const data = await res.json();
+        // 加载并渲染看板
+        function loadDashboard() {
+            const matches = matchDatabase[currentDateKey] || [];
+            
+            // 1. 渲染上方高风控精选卡片 (筛选置信度 >= 88% 的场次)
+            const premiumContainer = document.getElementById('premium-container');
+            const topMatches = matches.filter(m => m.rate >= 88);
 
-                if (data.success && data.matches) {
-                    renderDashboard(data.matches);
-                } else {
-                    throw new Error("无数据");
-                }
-            } catch (e) {
-                console.warn("API 响应延迟，已加载专业量化备用精算库", e);
-                renderFallbackDashboard();
+            if (topMatches.length > 0) {
+                premiumContainer.innerHTML = topMatches.map(m => `
+                    <div class="bg-slate-900 border border-slate-800 hover:border-amber-500/50 p-4 rounded-2xl transition space-y-3 shadow-lg">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="px-2 py-0.5 rounded bg-slate-800 text-amber-400 font-mono font-bold">${m.id} | 🏆 ${m.league} | ⏰ ${m.time}</span>
+                            <span class="bg-emerald-950 text-emerald-400 border border-emerald-800 px-2 py-0.5 rounded font-bold font-mono">置信度 ${m.rate}%</span>
+                        </div>
+                        <div class="flex justify-between items-center py-1">
+                            <span class="font-bold text-base text-slate-100">${m.home}</span>
+                            <span class="text-xs font-black text-amber-500 px-3 py-1 bg-amber-500/10 rounded-lg">VS</span>
+                            <span class="font-bold text-base text-slate-100">${m.away}</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-slate-800 font-mono">
+                            <div>建议方向: <strong class="text-amber-400">${m.dir}</strong></div>
+                            <div>半全场(HT/FT): <strong class="text-slate-200">${m.htft}</strong></div>
+                        </div>
+                        <div class="text-xs text-slate-300 font-mono flex items-center gap-1">
+                            🎯 预测比分: <span class="text-emerald-400 font-bold">${m.score}</span>
+                        </div>
+                        <div class="text-xs text-slate-400 bg-slate-950 p-2.5 rounded-xl border border-slate-800/60 leading-relaxed">
+                            💡 风控点评: ${m.comment}
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                premiumContainer.innerHTML = `<div class="col-span-2 text-center py-8 text-slate-500 text-xs bg-slate-900 rounded-2xl border border-slate-800">当前日期暂无置信度 ≥ 88% 的高风控精选标的</div>`;
+            }
+
+            // 2. 渲染下方完整赛事列表（带日期和时间）
+            const listContainer = document.getElementById('full-match-list');
+            document.getElementById('match-count-badge').innerText = `共 ${matches.length} 场`;
+
+            if (matches.length > 0) {
+                listContainer.innerHTML = matches.map(m => `
+                    <div class="p-3.5 flex flex-col md:flex-row justify-between items-start md:items-center gap-2 hover:bg-slate-800/40 transition text-xs">
+                        <div class="flex items-center space-x-3">
+                            <span class="font-mono font-bold text-amber-400 w-16">${m.id}</span>
+                            <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300">[${m.league}]</span>
+                            <span class="font-bold text-slate-100">${m.home} vs ${m.away}</span>
+                        </div>
+                        <div class="flex items-center flex-wrap gap-3 font-mono text-slate-300">
+                            <span class="text-amber-400 font-semibold">${m.dir}</span>
+                            <span class="text-slate-400">HT/FT: ${m.htft}</span>
+                            <span class="text-emerald-400 font-bold">🎯 ${m.score}</span>
+                            <span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800 font-bold">置信度 ${m.rate}%</span>
+                            <span class="text-slate-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">${m.time}</span>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                listContainer.innerHTML = `<div class="p-8 text-center text-slate-500 text-xs">当前日历暂无比赛赛事数据</div>`;
             }
         }
 
-        // 渲染完整高级看板
-        function renderDashboard(matches) {
-            // 1. 渲染上方“高风控精选”卡片（取前2场高置信度）
-            const premiumContainer = document.getElementById('premium-container');
-            const topTwo = matches.slice(0, 2);
-            
-            premiumContainer.innerHTML = topTwo.map((m, idx) => `
-                <div class="bg-slate-900 border border-slate-800 hover:border-amber-500/50 p-4 rounded-2xl transition space-y-3 shadow-lg">
-                    <div class="flex justify-between items-center text-xs">
-                        <span class="px-2 py-0.5 rounded bg-slate-800 text-amber-400 font-mono font-bold">周一-00${idx+1} | 🏆 ${currentSport === 'football' ? '葡超/巴甲' : 'NBA'}</span>
-                        <span class="bg-emerald-950 text-emerald-400 border border-emerald-800 px-2 py-0.5 rounded font-bold font-mono">置信度 ${m.rating || 89}%</span>
-                    </div>
-                    <div class="flex justify-between items-center py-1">
-                        <span class="font-bold text-base text-slate-100">${tName(m.home)}</span>
-                        <span class="text-xs font-black text-amber-500 px-3 py-1 bg-amber-500/10 rounded-lg">VS</span>
-                        <span class="font-bold text-base text-slate-100">${tName(m.away)}</span>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-slate-800 font-mono">
-                        <div>建议方向: <strong class="text-amber-400">主胜 / 让球胜</strong></div>
-                        <div>半全场(HT/FT): <strong class="text-slate-200">胜胜 (1/1)</strong></div>
-                    </div>
-                    <div class="text-xs text-slate-300 font-mono flex items-center gap-1">
-                        🎯 预测比分: <span class="text-emerald-400 font-bold">2-0 / 2-1</span>
-                    </div>
-                    <div class="text-xs text-slate-400 bg-slate-950 p-2.5 rounded-xl border border-slate-800/60 leading-relaxed">
-                        💡 风控点评: 机构离散度极低，主场压制力强，xG 预期进球差显著，首选主胜。
-                    </div>
-                </div>
-            `).join('');
-
-            // 2. 渲染下方“完整赛事列表”表格
-            const listContainer = document.getElementById('full-match-list');
-            listContainer.innerHTML = matches.map((m, idx) => `
-                <div class="p-3.5 flex flex-col md:flex-row justify-between items-start md:items-center gap-2 hover:bg-slate-800/40 transition text-xs">
-                    <div class="flex items-center space-x-3">
-                        <span class="font-mono font-bold text-amber-400">周一-00${idx+1}</span>
-                        <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300">[${currentSport === 'football' ? '主流联赛' : 'NBA'}]</span>
-                        <span class="font-bold text-slate-100">${tName(m.home)} vs ${tName(m.away)}</span>
-                    </div>
-                    <div class="flex items-center flex-wrap gap-3 font-mono text-slate-300">
-                        <span class="text-amber-400">主胜 (稳胆)</span>
-                        <span class="text-slate-400">HT/FT: 胜胜</span>
-                        <span class="text-emerald-400 font-bold">🎯 2-0 / 2-1</span>
-                        <span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800 font-bold">置信度 ${m.rating || 88}%</span>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // 离线专业精算备用数据
-        function renderFallbackDashboard() {
-            const mockMatches = [
-                { home: "Santa Clara", away: "Benfica", rating: 89 },
-                { home: "Flamengo", away: "Atletico Mineiro", rating: 91 },
-                { home: "Arsenal", away: "Chelsea", rating: 84 },
-                { home: "Manchester City", away: "Liverpool", rating: 88 }
-            ];
-            renderDashboard(mockMatches);
-        }
-
-        // 初始化加载
-        window.onload = loadData;
+        // 初始化默认加载
+        window.onload = () => {
+            switchDate('today');
+        };
     </script>
 </body>
 </html>
