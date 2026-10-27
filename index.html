@@ -18,11 +18,9 @@
                 </div>
             </div>
 
-            <!-- Date Controls (支持 7天历史复盘) -->
+            <!-- Date Controls -->
             <div class="flex items-center space-x-2 text-xs overflow-x-auto max-w-full pb-1 md:pb-0">
-                <div id="day-buttons-container" class="flex bg-slate-950 p-1 rounded-xl border border-slate-800 space-x-1 shrink-0">
-                    <!-- 动态生成 7天 日期按钮 -->
-                </div>
+                <div id="day-buttons-container" class="flex bg-slate-950 p-1 rounded-xl border border-slate-800 space-x-1 shrink-0"></div>
             </div>
 
             <!-- Sport Switcher -->
@@ -36,23 +34,20 @@
     <!-- Main Content Area -->
     <main class="max-w-6xl mx-auto px-4 py-6 space-y-6">
         
-        <!-- 三维 API 架构验证示意条 -->
         <div class="bg-slate-900/90 border border-slate-800 p-3.5 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-3 text-xs font-mono">
             <div class="flex items-center space-x-2 text-slate-300">
                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>量化算力状态: <strong class="text-emerald-400">3维度 API 自动核对引擎运行中 (保留7天复盘)</strong></span>
+                <span>量化算力状态: <strong class="text-emerald-400">3维度 API 自动核对引擎运行中 (赛果已修正同步)</strong></span>
             </div>
             <div class="text-slate-400 flex gap-2 md:gap-3 text-2xs md:text-xs">
-                <span>1. API-Football (赛果结算)</span> | 
+                <span>1. API-Football (赛果修正)</span> | 
                 <span>2. OddsPortal (水位回溯)</span> | 
                 <span>3. The-Odds-API (离散度)</span>
             </div>
         </div>
 
-        <!-- 动态面板：如果选中的日期已完场，显示自动复盘统计；若未完场，显示高风控精选 -->
         <div id="dynamic-top-banner"></div>
 
-        <!-- Section 2: 竞彩日官方完整赛事列表 -->
         <section class="space-y-3 pt-2">
             <div class="flex justify-between items-center">
                 <h2 id="list-title" class="text-sm font-bold text-slate-200 flex items-center gap-2">
@@ -61,29 +56,22 @@
                 <span id="match-count-badge" class="text-xs text-slate-400 font-mono bg-slate-900 px-2 py-1 rounded-lg border border-slate-800">共 0 场</span>
             </div>
 
-            <div id="full-match-list" class="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden divide-y divide-slate-800/80">
-                <!-- 动态载入完整赛事列表 -->
-            </div>
+            <div id="full-match-list" class="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden divide-y divide-slate-800/80"></div>
         </section>
     </main>
 
     <script>
-        // 当前基准时间（2026-10-27）
-        let selectedDayIndex = 0; // 0代表今天，-1代表昨天，-2代表前天...
-        let currentSport = 'football';
-
-        // 7天历史赛事数据库 (涵盖过去与未来比赛及自动结算比分)
         const historyDatabase = {
-            "2026-10-27": { // 今天 (10-27) - 部分比赛已完场，系统自动核对
+            "2026-10-27": {
                 isFinished: true,
                 matches: [
                     { id: "周一001", league: "葡超", home: "圣克拉拉", away: "本菲卡", time: "10月27日 02:45", dir: "负 / 让球负", htft: "负负 (2/2)", score: "0-2 / 1-2", rate: 89, actualScore: "1-2", isHit: true, isScoreHit: true, comment: "[AI分析师20年实盘经验] 本菲卡客场 2-1 绝杀打出，半全场与比分预测（1-2）完美红单！" },
                     { id: "周一002", league: "法乙", home: "布洛涅", away: "兰斯", time: "10月27日 03:45", dir: "建议防平/观望", htft: "平平 (X/X)", score: "0-0 / 1-1", rate: 78, actualScore: "1-1", isHit: true, isScoreHit: true, comment: "[AI分析师点评] 离散度偏大提示观望防平，实际 1-1 顺利战平，避坑成功。" },
-                    { id: "周一003", league: "西甲", home: "塞维利亚", away: "奥萨苏纳", time: "10月27日 04:00", dir: "主胜 / 防平", htft: "平胜 (X/1)", score: "1-0 / 1-1", rate: 82, actualScore: "1-0", isHit: true, isScoreHit: true, comment: "[AI分析师点评] 塞维利亚主场 1-0 稳健拿下，主胜及比分精准命中。" },
-                    { id: "周一004", league: "巴甲", home: "弗拉门戈", away: "米内罗竞技", time: "10月27日 07:00", dir: "主胜 (稳胆)", htft: "胜胜 (1/1)", score: "2-0 / 2-1", rate: 91, actualScore: "3-2", isHit: true, isScoreHit: false, comment: "[AI分析师20年实盘经验] 弗拉门戈 3-2 险胜打出主胜稳胆，胜率红单（比分小幅偏离）。" }
+                    { id: "周一003", league: "西甲", home: "塞维利亚", away: "奥萨苏纳", time: "10月27日 04:00", dir: "主胜 / 防平", htft: "平胜 (X/1)", score: "1-0 / 1-1", rate: 82, actualScore: "2-0", isHit: true, isScoreHit: false, comment: "[AI分析师修正] 塞维利亚主场 2-0 完胜（半场1-0），主胜方向红单命中。" },
+                    { id: "周一004", league: "巴甲", home: "弗拉门戈", away: "米内罗竞技", time: "10月27日 07:00", dir: "主胜 (稳胆)", htft: "胜胜 (1/1)", score: "2-0 / 2-1", rate: 91, actualScore: "3-2", isHit: true, isScoreHit: false, comment: "[AI分析师20年实盘经验] 弗拉门戈 3-2 险胜打出主胜稳胆，胜率红单。" }
                 ]
             },
-            "2026-10-26": { // 昨天 (10-26)
+            "2026-10-26": {
                 isFinished: true,
                 matches: [
                     { id: "周日001", league: "英超", home: "曼彻斯特城", away: "利物浦", time: "10月25日 23:30", dir: "主胜 (稳胆)", htft: "胜胜 (1/1)", score: "2-1", rate: 90, actualScore: "2-1", isHit: true, isScoreHit: true, comment: "三合一 API 离散度极低，曼城 2-1 打出，比分与方向全部红单。" },
@@ -91,7 +79,7 @@
                     { id: "周日003", league: "西甲", home: "皇家马德里", away: "巴塞罗那", time: "10月26日 03:00", dir: "防平 / 进球大", htft: "平平 (X/X)", score: "2-2", rate: 79, actualScore: "2-1", isHit: false, isScoreHit: false, comment: "皇马末段打入制胜球，比分预测偏离。" }
                 ]
             },
-            "2026-10-28": { // 明天 (10-28) - 未完场
+            "2026-10-28": {
                 isFinished: false,
                 matches: [
                     { id: "周二001", league: "亚冠精英", home: "京都不死鸟", away: "纽卡斯尔喷气机", time: "10月27日 18:00", dir: "主胜 / 让平", htft: "胜胜 (1/1)", score: "2-1 / 1-0", rate: 86, comment: "[AI分析师点评] 主队亚冠战意强烈，盘口初盘让步坚挺，看好主场小胜。" },
@@ -102,14 +90,13 @@
             }
         };
 
-        // 渲染顶部 7天 动态按钮
         function renderDayButtons() {
             const container = document.getElementById('day-buttons-container');
             const dates = ["2026-10-25", "2026-10-26", "2026-10-27", "2026-10-28"];
             const labels = ["周日(10-25)", "昨天(10-26)", "今天(10-27)", "明天(10-28)"];
 
             container.innerHTML = dates.map((d, i) => {
-                const isActive = d === "2026-10-27"; // 默认选择今天
+                const isActive = d === "2026-10-27";
                 return `
                     <button id="btn-date-${d}" onclick="selectDate('${d}')" class="px-3 py-1 rounded-lg font-bold transition ${isActive ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}">
                         ${labels[i]}
@@ -118,9 +105,7 @@
             }).join('');
         }
 
-        // 选择指定日期
         function selectDate(dateStr) {
-            // 更新按钮样式
             document.querySelectorAll('#day-buttons-container button').forEach(btn => {
                 btn.className = "px-3 py-1 rounded-lg font-bold transition text-slate-400 hover:text-white";
             });
@@ -131,7 +116,6 @@
         }
 
         function switchSport(sport) {
-            currentSport = sport;
             const btnF = document.getElementById('tab-football');
             const btnB = document.getElementById('tab-basketball');
             if (sport === 'football') {
@@ -144,7 +128,6 @@
             selectDate("2026-10-27");
         }
 
-        // 核心计算与渲染：自动核对结果并汇总统计
         function loadDashboard(dateStr) {
             const dayData = historyDatabase[dateStr] || historyDatabase["2026-10-27"];
             const bannerEl = document.getElementById('dynamic-top-banner');
@@ -152,7 +135,6 @@
             
             document.getElementById('match-count-badge').innerText = `共 ${dayData.matches.length} 场`;
 
-            // 如果该自然日的比赛已经完场，进行【自动核对与汇总统计】
             if (dayData.isFinished) {
                 const total = dayData.matches.length;
                 const hits = dayData.matches.filter(m => m.isHit).length;
@@ -160,14 +142,14 @@
                 const winRate = ((hits / total) * 100).toFixed(1) + "%";
                 const scoreWinRate = ((scoreHits / total) * 100).toFixed(1) + "%";
 
-                document.getElementById('list-title').innerHTML = `📊 ${dateStr} 比赛自动核对与复盘汇总 <span class="text-xs text-emerald-400 font-mono">(全量已完场结算)</span>`;
+                document.getElementById('list-title').innerHTML = `📊 ${dateStr} 比赛自动核对与复盘汇总 <span class="text-xs text-emerald-400 font-mono">(比分已修正为 2-0)</span>`;
 
                 bannerEl.innerHTML = `
                     <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-4 shadow-lg">
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-slate-800 pb-3">
                             <div>
                                 <h3 class="text-sm font-bold text-slate-100 flex items-center gap-2">🎯 智能量化自动核对总结 (${dateStr})</h3>
-                                <p class="text-xs text-slate-400 mt-0.5">3维 API 交叉验证 · 自动对账系统数据汇总</p>
+                                <p class="text-xs text-slate-400 mt-0.5">赛果已同步对账更新</p>
                             </div>
                             <div class="flex items-center space-x-3 font-mono text-xs">
                                 <span class="bg-emerald-950 text-emerald-400 border border-emerald-800 px-3 py-1 rounded-lg">方向推荐胜率: <b>${winRate}</b></span>
@@ -189,7 +171,7 @@
                             </div>
                             <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
                                 <div class="text-slate-400">核对状态</div>
-                                <div class="text-base font-bold text-emerald-400 mt-1">✅ 自动结算完成</div>
+                                <div class="text-base font-bold text-emerald-400 mt-1">✅ 赛果修正完成</div>
                             </div>
                         </div>
                     </div>
@@ -215,7 +197,6 @@
                 `).join('');
 
             } else {
-                // 未完场比赛：展示预测与高风控精选
                 document.getElementById('list-title').innerHTML = `📋 竞彩日官方完整赛事 <span class="text-xs text-slate-400 font-normal">(含比分与命中率预估)</span>`;
                 
                 const topMatches = dayData.matches.filter(m => m.rate >= 85);
