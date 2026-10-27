@@ -112,7 +112,7 @@
             const labels = ["周一(10-27)", "周二(10-28)", "周三/明天(10-29)"];
 
             container.innerHTML = dates.map((d, i) => {
-                const isActive = d === "2026-10-29"; // 默认选中周三明天
+                const isActive = d === "2026-10-29"; // 默认选中周三
                 return `
                     <button id="btn-date-${d}" onclick="selectDate('${d}')" class="px-3 py-1 rounded-lg font-bold transition ${isActive ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}">
                         ${labels[i]}
