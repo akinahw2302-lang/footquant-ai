@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FootQuant AI Pro 40.0 - 7天自动复盘引擎</title>
+    <title>FootQuant AI Pro 40.0 - Top5 旗舰量化看板</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen font-sans">
@@ -14,7 +14,7 @@
                 <div class="bg-amber-500 text-slate-950 font-black p-2 rounded-xl text-base">FQ</div>
                 <div>
                     <h1 class="text-base font-bold tracking-tight">FootQuant AI <span class="text-xs px-2 py-0.5 rounded-full bg-amber-950 text-amber-400 border border-amber-800">Pro 40.0 旗舰版</span></h1>
-                    <p class="text-xs text-slate-400">三维 API 交叉验证 · 周二10场全量算力引擎</p>
+                    <p class="text-xs text-slate-400">三维 API 交叉验证 · Top 5 核心稳胆精选引擎</p>
                 </div>
             </div>
 
@@ -37,12 +37,12 @@
         <div class="bg-slate-900/90 border border-slate-800 p-3.5 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-3 text-xs font-mono">
             <div class="flex items-center space-x-2 text-slate-300">
                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>量化算力状态: <strong class="text-emerald-400">3维度 API 意见高度一致 (周二10场已补全)</strong></span>
+                <span>量化算力状态: <strong class="text-emerald-400">已精简锁定 Top 5 最高置信度稳胆标的</strong></span>
             </div>
             <div class="text-slate-400 flex gap-2 md:gap-3 text-2xs md:text-xs">
-                <span>1. API-Football (基本面/伤病)</span> | 
-                <span>2. OddsPortal (资金偏离)</span> | 
-                <span>3. The-Odds-API (机构离散度)</span>
+                <span>1. API-Football (基本面)</span> | 
+                <span>2. OddsPortal (资金)</span> | 
+                <span>3. The-Odds-API (离散度)</span>
             </div>
         </div>
 
@@ -61,7 +61,6 @@
     </main>
 
     <script>
-        // 补齐周一与周二共10场完整赛事数据
         const historyDatabase = {
             "2026-10-27": {
                 isFinished: true,
@@ -84,7 +83,7 @@
                     { id: "周二007", league: "德国杯", home: "多特蒙德", away: "云达不来梅", time: "10月28日 03:45", dir: "主胜 (稳胆)", htft: "胜胜 (1/1)", score: "3-1 / 2-0", rate: 92, comment: "[AI分析师20年实盘经验] 多特主场火力极强，3者 API 意见高度一致，85%+ 强推标记！" },
                     { id: "周二008", league: "德国杯", home: "科隆", away: "柏林联合", time: "10月28日 03:45", dir: "让胜 / 平", htft: "平平 (X/X)", score: "1-1 / 1-0", rate: 80, comment: "[AI分析师点评] 杯赛变数较大，离散度未达到高置信度区间，防下盘打出。" },
                     { id: "周二009", league: "意甲", home: "罗马", away: "卡利亚里", time: "10月28日 03:45", dir: "主胜 (稳胆)", htft: "胜胜 (1/1)", score: "2-0 / 3-0", rate: 89, comment: "[AI分析师20年实盘经验] 罗马主场优势突出，机构离散度极为集中，建议深盘主胜。" },
-                    { id: "周二010", league: "意甲", home: "都灵", away: "科莫", time: "10月28日 03:45", dir: "主胜 / 防平", htft: "平胜 (X/1)", score: "1-0 / 0-0", rate: 83, comment: "[AI分析师点评] 都灵防守稳健但进攻效率偏低，首选主胜防平。" }
+                    { id: "周二010", league: "意甲", home: "都灵", away: "科莫", time: "10月28日 03:45", dir: "主胜 / 防平", htft: "平胜 (X/1)", score: "1-0 / 0-0", rate: 83, comment: "[AI分析师点评] 都灵都灵防守稳健但进攻效率偏低，首选主胜防平。" }
                 ]
             }
         };
@@ -198,12 +197,14 @@
             } else {
                 document.getElementById('list-title').innerHTML = `📋 竞彩日官方完整赛事 <span class="text-xs text-slate-400 font-normal">(含比分与命中率预估)</span>`;
                 
-                const topMatches = dayData.matches.filter(m => m.rate >= 85);
+                // 核心修改：按置信度降序排序，并严格只取 Top 5 最稳标的
+                const topMatches = [...dayData.matches].sort((a, b) => b.rate - a.rate).slice(0, 5);
+                
                 bannerEl.innerHTML = `
                     <section class="space-y-3">
                         <div class="flex justify-between items-center">
                             <h2 class="text-sm font-bold text-slate-200 flex items-center gap-2">
-                                🔥 高风控精选 <span class="text-xs text-slate-400 font-normal">(含半全场 HT/FT 策略模型)</span>
+                                🔥 高风控精选 Top 5 核心稳胆 <span class="text-xs text-slate-400 font-normal">(模型置信度最高)</span>
                             </h2>
                             <span class="text-xs text-emerald-400 font-mono">风控原则: 严格过滤海爆冷温差场次</span>
                         </div>
