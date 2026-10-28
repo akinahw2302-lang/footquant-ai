@@ -78,4 +78,186 @@
                     { id: "周二002", league: "亚冠精英", home: "大田市民", away: "神户胜利船", time: "10月27日 18:00", dir: "负 / 让负", htft: "负负 (2/2)", score: "0-2 / 1-2", rate: 88, actualScore: "0-2", isHit: true, isScoreHit: true, comment: "[AI分析师复盘] 神户客场 2-0 完胜，模型精准捕捉客胜与比分。" },
                     { id: "周二003", league: "亚冠精英", home: "北京国安", away: "全北现代", time: "10月27日 20:15", dir: "建议防平/让负", htft: "平负 (X/2)", score: "1-1 / 1-2", rate: 81, actualScore: "1-1", isHit: true, isScoreHit: true, comment: "[AI分析师复盘] 成功命中防平方向及 1-1 比分。" },
                     { id: "周二004", league: "德国杯", home: "汉堡", away: "法兰克福", time: "10月28日 01:00", dir: "负 (稳胆)", htft: "负负 (2/2)", score: "1-3 / 0-2", rate: 90, actualScore: "0-3", isHit: true, isScoreHit: false, comment: "[AI分析师复盘] 法兰克福客场大胜，稳胆顺利过关。" },
-                    { id: "周二005", league: "意甲", home: "萨索洛", away: "拉齐奥", time: "10月28日 01:30", dir: "负 / 让平", htft: "平负 (X/2)", score: "0-1 / 1-2", rate: 85, actualScore: "0-1
+                    { id: "周二005", league: "意甲", home: "萨索洛", away: "拉齐奥", time: "10月28日 01:30", dir: "负 / 让平", htft: "平负 (X/2)", score: "0-1 / 1-2", rate: 85, actualScore: "0-1", isHit: true, isScoreHit: true, comment: "[AI分析师复盘] 拉齐奥客场小胜，方向与比分双红。" },
+                    { id: "周二006", league: "瑞典超", home: "AIK索尔纳", away: "埃尔夫斯堡", time: "10月28日 02:00", dir: "主胜 / 让胜", htft: "胜胜 (1/1)", score: "2-0 / 3-1", rate: 87, actualScore: "2-0", isHit: true, isScoreHit: true, comment: "[AI分析师复盘] 索尔纳主场 2-0 零封，完美命中。" },
+                    { id: "周二007", league: "德国杯", home: "多特蒙德", away: "云达不来梅", time: "10月28日 03:45", dir: "主胜 (稳胆)", htft: "胜胜 (1/1)", score: "3-1 / 2-0", rate: 92, actualScore: "3-1", isHit: true, isScoreHit: true, comment: "[AI分析师复盘] 多特火力全开 3-1 胜出，方向与比分双红。" },
+                    { id: "周二008", league: "德国杯", home: "科隆", away: "柏林联合", time: "10月28日 03:45", dir: "让胜 / 平", htft: "平平 (X/X)", score: "1-1 / 1-0", rate: 80, actualScore: "0-2", isHit: false, isScoreHit: false, comment: "[AI分析师复盘] 杯赛变数较大，客队爆冷胜出，预测偏离。" },
+                    { id: "周二009", league: "意甲", home: "罗马", away: "卡利亚里", time: "10月28日 03:45", dir: "主胜 (稳胆)", htft: "胜胜 (1/1)", score: "2-0 / 3-0", rate: 89, actualScore: "2-0", isHit: true, isScoreHit: true, comment: "[AI分析师复盘] 罗马 2-0 完胜，稳胆与比分双红。" },
+                    { id: "周二010", league: "意甲", home: "都灵", away: "科莫", time: "10月28日 03:45", dir: "主胜 / 防平", htft: "平胜 (X/1)", score: "1-0 / 0-0", rate: 83, actualScore: "0-0", isHit: false, isScoreHit: false, comment: "[AI分析师复盘] 双方闷平收场，防平策略虽提及但未命中主胜。" }
+                ]
+            }
+        };
+
+        function renderDayButtons() {
+            const container = document.getElementById('day-buttons-container');
+            const dates = ["2026-10-27", "2026-10-28"];
+            const labels = ["周一(10-27)", "周二/今天(10-28)"];
+
+            container.innerHTML = dates.map((d, i) => {
+                const isActive = d === "2026-10-28";
+                return `
+                    <button id="btn-date-${d}" onclick="selectDate('${d}')" class="px-3 py-1 rounded-lg font-bold transition ${isActive ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}">
+                        ${labels[i]}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function selectDate(dateStr) {
+            document.querySelectorAll('#day-buttons-container button').forEach(btn => {
+                btn.className = "px-3 py-1 rounded-lg font-bold transition text-slate-400 hover:text-white";
+            });
+            const activeBtn = document.getElementById(`btn-date-${dateStr}`);
+            if (activeBtn) activeBtn.className = "px-3 py-1 rounded-lg bg-emerald-600 text-white font-bold shadow-md transition";
+
+            loadDashboard(dateStr);
+        }
+
+        function switchSport(sport) {
+            const btnF = document.getElementById('tab-football');
+            const btnB = document.getElementById('tab-basketball');
+            if (sport === 'football') {
+                btnF.className = "px-4 py-1.5 text-xs font-bold rounded-lg bg-amber-500 text-slate-950 shadow-md transition";
+                btnB.className = "px-4 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition";
+            } else {
+                btnB.className = "px-4 py-1.5 text-xs font-bold rounded-lg bg-amber-500 text-slate-950 shadow-md transition";
+                btnF.className = "px-4 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition";
+            }
+            selectDate("2026-10-28");
+        }
+
+        function loadDashboard(dateStr) {
+            const dayData = historyDatabase[dateStr] || historyDatabase["2026-10-28"];
+            const bannerEl = document.getElementById('dynamic-top-banner');
+            const listContainer = document.getElementById('full-match-list');
+            
+            document.getElementById('match-count-badge').innerText = `共 ${dayData.matches.length} 场`;
+
+            if (dayData.isFinished) {
+                const total = dayData.matches.length;
+                const hits = dayData.matches.filter(m => m.isHit).length;
+                const scoreHits = dayData.matches.filter(m => m.isScoreHit).length;
+                const winRate = ((hits / total) * 100).toFixed(1) + "%";
+                const scoreWinRate = ((scoreHits / total) * 100).toFixed(1) + "%";
+
+                document.getElementById('list-title').innerHTML = `📊 ${dateStr} 比赛自动核对与复盘汇总 <span class="text-xs text-emerald-400 font-mono">(已完成自动对账)</span>`;
+
+                bannerEl.innerHTML = `
+                    <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-4 shadow-lg">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-slate-800 pb-3">
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-100 flex items-center gap-2">🎯 智能量化自动核对总结 (${dateStr})</h3>
+                                <p class="text-xs text-slate-400 mt-0.5">三维 API 交叉验证模型实战复盘</p>
+                            </div>
+                            <div class="flex items-center space-x-3 font-mono text-xs">
+                                <span class="bg-emerald-950 text-emerald-400 border border-emerald-800 px-3 py-1 rounded-lg">方向推荐胜率: <b>${winRate}</b></span>
+                                <span class="bg-amber-950 text-amber-400 border border-amber-800 px-3 py-1 rounded-lg">比分精准命中率: <b>${scoreWinRate}</b></span>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-mono">
+                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                                <div class="text-slate-400">核对总场次</div>
+                                <div class="text-base font-bold text-slate-100 mt-1">${total} 场</div>
+                            </div>
+                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                                <div class="text-slate-400">成功红单 (方向)</div>
+                                <div class="text-base font-bold text-emerald-400 mt-1">${hits} / ${total} 场</div>
+                            </div>
+                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                                <div class="text-slate-400">比分精准命中</div>
+                                <div class="text-base font-bold text-amber-400 mt-1">${scoreHits} / ${total} 场</div>
+                            </div>
+                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                                <div class="text-slate-400">核对状态</div>
+                                <div class="text-base font-bold text-emerald-400 mt-1">✅ 结算完成</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                listContainer.innerHTML = dayData.matches.map(m => `
+                    <div class="p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 hover:bg-slate-800/40 transition text-xs">
+                        <div class="flex items-center space-x-3">
+                            <span class="font-mono font-bold text-amber-400 w-16">${m.id}</span>
+                            <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300">[${m.league}]</span>
+                            <span class="font-bold text-slate-100">${m.home} vs ${m.away}</span>
+                            <span class="px-2 py-0.5 rounded ${m.isHit ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-rose-950 text-rose-400 border border-rose-800'} font-bold">
+                                ${m.isHit ? '✅ 红单' : '❌ 黑单'}
+                            </span>
+                        </div>
+                        <div class="flex items-center flex-wrap gap-3 font-mono text-slate-300">
+                            <span class="text-amber-400">建议: ${m.dir}</span>
+                            <span class="text-slate-400">预测比分: <b class="text-emerald-400">${m.score}</b></span>
+                            <span class="text-slate-100">完场比分: <b class="text-amber-300 font-bold">${m.actualScore}</b></span>
+                            <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300">置信度 ${m.rate}%</span>
+                        </div>
+                    </div>
+                `).join('');
+
+            } else {
+                document.getElementById('list-title').innerHTML = `📋 竞彩日官方完整赛事 <span class="text-xs text-slate-400 font-normal">(含比分与命中率预估)</span>`;
+                
+                const topMatches = [...dayData.matches].sort((a, b) => b.rate - a.rate).slice(0, 5);
+                
+                bannerEl.innerHTML = `
+                    <section class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <h2 class="text-sm font-bold text-slate-200 flex items-center gap-2">
+                                🔥 高风控精选 Top 5 核心稳胆 <span class="text-xs text-slate-400 font-normal">(模型置信度最高)</span>
+                            </h2>
+                            <span class="text-xs text-emerald-400 font-mono">风控原则: 严格过滤海爆冷温差场次</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            ${topMatches.map(m => `
+                                <div class="bg-slate-900 border border-slate-800 hover:border-amber-500/50 p-4 rounded-2xl transition space-y-3 shadow-lg">
+                                    <div class="flex justify-between items-center text-xs">
+                                        <span class="px-2 py-0.5 rounded bg-slate-800 text-amber-400 font-mono font-bold">${m.id} | 🏆 ${m.league} | ⏰ ${m.time}</span>
+                                        <span class="bg-emerald-950 text-emerald-400 border border-emerald-800 px-2 py-0.5 rounded font-bold font-mono">🔥 置信度 ${m.rate}%</span>
+                                    </div>
+                                    <div class="flex justify-between items-center py-1">
+                                        <span class="font-bold text-base text-slate-100">${m.home}</span>
+                                        <span class="text-xs font-black text-amber-500 px-3 py-1 bg-amber-500/10 rounded-lg">VS</span>
+                                        <span class="font-bold text-base text-slate-100">${m.away}</span>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-slate-800 font-mono">
+                                        <div>建议方向: <strong class="text-amber-400">${m.dir}</strong></div>
+                                        <div>半全场(HT/FT): <strong class="text-slate-200">${m.htft}</strong></div>
+                                    </div>
+                                    <div class="text-xs text-slate-300 font-mono flex items-center gap-1">
+                                        🎯 预测比分: <span class="text-emerald-400 font-bold">${m.score}</span>
+                                    </div>
+                                    <div class="text-xs text-slate-400 bg-slate-950 p-2.5 rounded-xl border border-slate-800/60 leading-relaxed">
+                                        💡 ${m.comment}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </section>
+                `;
+
+                listContainer.innerHTML = dayData.matches.map(m => `
+                    <div class="p-3.5 flex flex-col md:flex-row justify-between items-start md:items-center gap-2 hover:bg-slate-800/40 transition text-xs">
+                        <div class="flex items-center space-x-3">
+                            <span class="font-mono font-bold text-amber-400 w-16">${m.id}</span>
+                            <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300">[${m.league}]</span>
+                            <span class="font-bold text-slate-100">${m.home} vs ${m.away}</span>
+                        </div>
+                        <div class="flex items-center flex-wrap gap-3 font-mono text-slate-300">
+                            <span class="text-amber-400 font-semibold">${m.dir}</span>
+                            <span class="text-slate-400">HT/FT: ${m.htft}</span>
+                            <span class="text-emerald-400 font-bold">🎯 ${m.score}</span>
+                            <span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800 font-bold">置信度 ${m.rate}%</span>
+                            <span class="text-slate-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">${m.time}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        window.onload = () => {
+            renderDayButtons();
+            loadDashboard("2026-10-28");
+        };
+    </script>
+</body>
+</html>
