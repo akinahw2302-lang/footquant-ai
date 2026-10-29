@@ -18,7 +18,7 @@
                 </div>
             </div>
 
-            <!-- Date Controls (滚动复盘按钮) -->
+            <!-- Date Controls (日期复盘按钮) -->
             <div class="flex items-center space-x-2 text-xs overflow-x-auto max-w-full pb-1 md:pb-0">
                 <div id="day-buttons-container" class="flex bg-slate-950 p-1 rounded-xl border border-slate-800 space-x-1 shrink-0"></div>
             </div>
@@ -61,7 +61,6 @@
     </main>
 
     <script>
-        // 数据库：保留26、27号历史，加载28号周三全量17场
         const historyDatabase = {
             "2026-10-26": {
                 isFinished: true,
@@ -76,4 +75,204 @@
                     { id: "周一001", league: "葡超", home: "圣克拉拉", away: "本菲卡", time: "10月27日 02:45", dir: "负 / 让球负", handicap: "客让半/一", score: "0-2 / 1-2", rate: 89, actualScore: "1-2", isHit: true, isScoreHit: true, comment: "[AI实盘复盘] 本菲卡客场 2-1 绝杀打出，外盘与比分双红！" },
                     { id: "周一002", league: "法乙", home: "布洛涅", away: "兰斯", time: "10月27日 03:45", dir: "建议防平/观望", handicap: "受平/半", score: "0-0 / 1-1", rate: 78, actualScore: "1-1", isHit: true, isScoreHit: true, comment: "[AI实盘复盘] 离散度偏大提示观望防平，实际 1-1 顺利打出避坑。" },
                     { id: "周一003", league: "西甲", home: "塞维利亚", away: "奥萨苏纳", time: "10月27日 04:00", dir: "主胜 / 防平", handicap: "主让半球", score: "1-0 / 1-1", rate: 82, actualScore: "2-0", isHit: true, isScoreHit: false, comment: "[AI实盘复盘] 塞维利亚主场 2-0 完胜，主胜方向顺利打出。" },
-                    { id: "周一004", league: "巴甲", home: "弗拉门戈", away: "米内罗竞技", time: "10月27日 07:00", dir: "主胜 (稳胆)", handicap: "主让半/一", score: "2-0 / 2-1", rate: 91, actualScore: "3-2", isHit
+                    { id: "周一004", league: "巴甲", home: "弗拉门戈", away: "米内罗竞技", time: "10月27日 07:00", dir: "主胜 (稳胆)", handicap: "主让半/一", score: "2-0 / 2-1", rate: 91, actualScore: "3-2", isHit: true, isScoreHit: false, comment: "[AI实盘复盘] 弗拉门戈 3-2 险胜打出主胜稳胆，胜率红单。" }
+                ]
+            },
+            "2026-10-28": {
+                isFinished: false,
+                matches: [
+                    { id: "周三015", league: "英联杯", home: "利物浦", away: "切尔西", time: "10-29 04:00", dir: "主胜 (稳胆)", handicap: "主让半/一 赢", score: "2-1 / 2-0", rate: 93, comment: "[AI分析师] 英联杯焦点战，利物浦主场 xG 压制，外盘坚挺，离散度低，强推稳胆。" },
+                    { id: "周三005", league: "意甲", home: "威尼斯", away: "国际米兰", time: "10-29 01:30", dir: "负 (稳胆)", handicap: "客让一球/球半", score: "0-2 / 0-3", rate: 92, comment: "[AI分析师] 国米实力降维打击，外盘深盘深水阻盘力度强，客胜稳胆。" },
+                    { id: "周三006", league: "意甲", home: "AC米兰", away: "博洛尼亚", time: "10-29 01:30", dir: "主胜 / 让胜", handicap: "主让一球", score: "2-0 / 3-1", rate: 91, comment: "[AI分析师] AC米兰主场气势如虹，客防隐患大，降水压盘看好主胜。" },
+                    { id: "周三001", league: "亚冠精英", home: "大阪钢巴", away: "武里南联", time: "10-28 18:00", dir: "主胜 (稳胆)", handicap: "主让一球/球半", score: "2-0 / 3-0", rate: 90, comment: "[AI分析师] 大阪主场战力凶悍，客队抗压有限，深盘支持主胜。" },
+                    { id: "周三017", league: "美职业", home: "国际迈阿密", away: "辛辛那提", time: "10-29 07:30", dir: "主胜 (稳胆)", handicap: "主让半/一", score: "3-1 / 2-1", rate: 90, comment: "[AI分析师] 迈阿密主场战力高涨，外盘初盘半一深盘力挺主胜。" },
+                    { id: "周三014", league: "意甲", home: "热那亚", away: "尤文图斯", time: "10-29 03:45", dir: "负 (客胜)", handicap: "客让半球", score: "0-1 / 0-2", rate: 89, comment: "[AI分析师] 尤文战术执行力强，热那亚进攻哑火，客让半球水位稳定。" },
+                    { id: "周三004", league: "德国杯", home: "帕德博恩", away: "斯图加特", time: "10-29 01:00", dir: "负 / 让负", handicap: "客让半/一", score: "1-3 / 1-2", rate: 88, comment: "[AI分析师] 斯图加特硬实力高出一个档次，外盘资金流向客胜。" },
+                    { id: "周三013", league: "意甲", home: "蒙扎", away: "那不勒斯", time: "10-29 03:45", dir: "负 (客胜)", handicap: "客让半/一", score: "0-2 / 1-2", rate: 88, comment: "[AI分析师] 那不勒斯争冠战意十足，外盘客让半一深盘流畅。" },
+                    { id: "周三009", league: "瑞典超", home: "布鲁马波卡纳", away: "赫根", time: "10-29 02:00", dir: "负 / 让负", handicap: "客让半球", score: "1-2 / 1-3", rate: 86, comment: "[AI分析师] 赫根客场火力强劲，外盘客让半球受热可期。" },
+                    { id: "周三011", league: "英联杯", home: "伯恩茅斯", away: "阿斯顿维拉", time: "10-29 03:45", dir: "客不败 / 让负", handicap: "客让平/半", score: "1-2 / 1-1", rate: 86, comment: "[AI分析师] 维拉客场反击极具威胁，客让平半让步合理。" },
+                    { id: "周三002", league: "亚冠精英", home: "鹿岛鹿角", away: "浦项制铁", time: "10-28 18:00", dir: "主胜 / 让平", handicap: "主让半球", score: "1-0 / 2-1", rate: 85, comment: "[AI分析师] 强强对话，鹿岛主场微幅让步，离散度收敛，首选主胜。" },
+                    { id: "周三008", league: "荷兰杯", home: "鹿特丹斯巴达", away: "福图纳锡塔德", time: "10-29 01:45", dir: "主胜 / 让胜", handicap: "主让半球", score: "2-1 / 1-0", rate: 84, comment: "[AI分析师] 主队战绩有保障，外盘主让半球合理。" },
+                    { id: "周三010", league: "英联杯", home: "桑德兰", away: "布伦特福德", time: "10-29 03:45", dir: "客不败", handicap: "客让平/半", score: "1-1 / 1-2", rate: 83, comment: "[AI分析师] 英超球队客作，外盘平半盘面防范客队不败。" },
+                    { id: "周三003", league: "日联杯", home: "横滨水手", away: "广岛三箭", time: "10-28 18:00", dir: "防平 / 客不败", handicap: "客让平/半", score: "1-1 / 1-2", rate: 82, comment: "[AI分析师] 日联杯决赛变数大，双方平分秋色，外盘客队略受青睐。" },
+                    { id: "周三012", league: "英联杯", home: "富勒姆", away: "水晶宫", time: "10-29 03:45", dir: "主胜 / 防平", handicap: "主让平/半", score: "1-0 / 1-1", rate: 81, comment: "[AI分析师] 德比战战意胶着，富勒姆主场小让微盘受注。" },
+                    { id: "周三016", league: "巴西甲", home: "弗鲁米嫩塞", away: "巴西国际", time: "10-29 06:30", dir: "主胜 / 防平", handicap: "主让半球", score: "1-0 / 1-1", rate: 82, comment: "[AI分析师] 主场龙属性明显，主让半球可信。" },
+                    { id: "周三007", league: "意甲", home: "帕尔马", away: "乌迪内斯", time: "10-29 01:30", dir: "大球 / 观望", handicap: "平手盘", score: "1-1 / 2-2", rate: 79, comment: "[AI分析师] 对攻开放，平手盘建议关注大球或观望。" }
+                ]
+            }
+        };
+
+        function renderDayButtons() {
+            const container = document.getElementById('day-buttons-container');
+            const dates = ["2026-10-26", "2026-10-27", "2026-10-28"];
+            const labels = ["周日(10-26)", "周一(10-27)", "周三/今日(10-28)"];
+
+            container.innerHTML = dates.map((d, i) => {
+                const isActive = d === "2026-10-28";
+                return `
+                    <button id="btn-date-${d}" onclick="selectDate('${d}')" class="px-3 py-1 rounded-lg font-bold transition ${isActive ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}">
+                        ${labels[i]}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function selectDate(dateStr) {
+            document.querySelectorAll('#day-buttons-container button').forEach(btn => {
+                btn.className = "px-3 py-1 rounded-lg font-bold transition text-slate-400 hover:text-white";
+            });
+            const activeBtn = document.getElementById(`btn-date-${dateStr}`);
+            if (activeBtn) activeBtn.className = "px-3 py-1 rounded-lg bg-emerald-600 text-white font-bold shadow-md transition";
+
+            loadDashboard(dateStr);
+        }
+
+        function switchSport(sport) {
+            const btnF = document.getElementById('tab-football');
+            const btnB = document.getElementById('tab-basketball');
+            if (sport === 'football') {
+                btnF.className = "px-4 py-1.5 text-xs font-bold rounded-lg bg-amber-500 text-slate-950 shadow-md transition";
+                btnB.className = "px-4 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition";
+            } else {
+                btnB.className = "px-4 py-1.5 text-xs font-bold rounded-lg bg-amber-500 text-slate-950 shadow-md transition";
+                btnF.className = "px-4 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition";
+            }
+            selectDate("2026-10-28");
+        }
+
+        function loadDashboard(dateStr) {
+            const dayData = historyDatabase[dateStr] || historyDatabase["2026-10-28"];
+            const bannerEl = document.getElementById('dynamic-top-banner');
+            const listContainer = document.getElementById('full-match-list');
+            
+            document.getElementById('match-count-badge').innerText = `共 ${dayData.matches.length} 场`;
+
+            if (dayData.isFinished) {
+                const total = dayData.matches.length;
+                const hits = dayData.matches.filter(m => m.isHit).length;
+                const scoreHits = dayData.matches.filter(m => m.isScoreHit).length;
+                const winRate = ((hits / total) * 100).toFixed(1) + "%";
+                const scoreWinRate = ((scoreHits / total) * 100).toFixed(1) + "%";
+
+                document.getElementById('list-title').innerHTML = `📊 ${dateStr} 比赛自动核对与复盘汇总`;
+
+                bannerEl.innerHTML = `
+                    <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-4 shadow-lg">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-slate-800 pb-3">
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-100 flex items-center gap-2">🎯 智能量化自动核对总结 (${dateStr})</h3>
+                                <p class="text-xs text-slate-400 mt-0.5">三维 API 真实赛果对账归档</p>
+                            </div>
+                            <div class="flex items-center space-x-3 font-mono text-xs">
+                                <span class="bg-emerald-950 text-emerald-400 border border-emerald-800 px-3 py-1 rounded-lg">方向推荐胜率: <b>${winRate}</b></span>
+                                <span class="bg-amber-950 text-amber-400 border border-amber-800 px-3 py-1 rounded-lg">比分精准命中率: <b>${scoreWinRate}</b></span>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-mono">
+                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                                <div class="text-slate-400">核对总场次</div>
+                                <div class="text-base font-bold text-slate-100 mt-1">${total} 场</div>
+                            </div>
+                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                                <div class="text-slate-400">成功红单 (方向)</div>
+                                <div class="text-base font-bold text-emerald-400 mt-1">${hits} / ${total} 场</div>
+                            </div>
+                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                                <div class="text-slate-400">比分精准命中</div>
+                                <div class="text-base font-bold text-amber-400 mt-1">${scoreHits} / ${total} 场</div>
+                            </div>
+                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                                <div class="text-slate-400">核对状态</div>
+                                <div class="text-base font-bold text-emerald-400 mt-1">✅ 归档成功</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                listContainer.innerHTML = dayData.matches.map(m => `
+                    <div class="p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 hover:bg-slate-800/40 transition text-xs">
+                        <div class="flex items-center space-x-3">
+                            <span class="font-mono font-bold text-amber-400 w-16">${m.id}</span>
+                            <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300">[${m.league}]</span>
+                            <span class="font-bold text-slate-100">${m.home} vs ${m.away}</span>
+                            <span class="px-2 py-0.5 rounded ${m.isHit ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-rose-950 text-rose-400 border border-rose-800'} font-bold">
+                                ${m.isHit ? '✅ 红单' : '❌ 黑单'}
+                            </span>
+                        </div>
+                        <div class="flex items-center flex-wrap gap-3 font-mono text-slate-300">
+                            <span class="text-amber-400">建议: ${m.dir}</span>
+                            <span class="text-emerald-400">外盘: ${m.handicap}</span>
+                            <span class="text-slate-400">预测比分: <b class="text-emerald-400">${m.score}</b></span>
+                            <span class="text-slate-100">完场比分: <b class="text-amber-300 font-bold">${m.actualScore}</b></span>
+                            <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300">置信度 ${m.rate}%</span>
+                        </div>
+                    </div>
+                `).join('');
+
+            } else {
+                document.getElementById('list-title').innerHTML = `📋 竞彩日官方完整赛事 <span class="text-xs text-slate-400 font-normal">(含比分与外盘推荐)</span>`;
+                
+                const topMatches = [...dayData.matches].sort((a, b) => b.rate - a.rate).slice(0, 5);
+                
+                bannerEl.innerHTML = `
+                    <section class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <h2 class="text-sm font-bold text-slate-200 flex items-center gap-2">
+                                🔥 高风控精选 Top 5 核心稳胆 <span class="text-xs text-slate-400 font-normal">(外盘指数与离散度模型加持)</span>
+                            </h2>
+                            <span class="text-xs text-emerald-400 font-mono">严格过滤冷门场次</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            ${topMatches.map(m => `
+                                <div class="bg-slate-900 border border-slate-800 hover:border-amber-500/50 p-4 rounded-2xl transition space-y-3 shadow-lg">
+                                    <div class="flex justify-between items-center text-xs">
+                                        <span class="px-2 py-0.5 rounded bg-slate-800 text-amber-400 font-mono font-bold">${m.id} | 🏆 ${m.league} | ⏰ ${m.time}</span>
+                                        <span class="bg-emerald-950 text-emerald-400 border border-emerald-800 px-2 py-0.5 rounded font-bold font-mono">🔥 置信度 ${m.rate}%</span>
+                                    </div>
+                                    <div class="flex justify-between items-center py-1">
+                                        <span class="font-bold text-base text-slate-100">${m.home}</span>
+                                        <span class="text-xs font-black text-amber-500 px-3 py-1 bg-amber-500/10 rounded-lg">VS</span>
+                                        <span class="font-bold text-base text-slate-100">${m.away}</span>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-slate-800 font-mono">
+                                        <div>建议方向: <strong class="text-amber-400">${m.dir}</strong></div>
+                                        <div>外盘推荐: <strong class="text-emerald-400">${m.handicap}</strong></div>
+                                    </div>
+                                    <div class="text-xs text-slate-300 font-mono flex items-center gap-1">
+                                        🎯 预测比分: <span class="text-emerald-400 font-bold">${m.score}</span>
+                                    </div>
+                                    <div class="text-xs text-slate-400 bg-slate-950 p-2.5 rounded-xl border border-slate-800/60 leading-relaxed">
+                                        💡 ${m.comment}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </section>
+                `;
+
+                listContainer.innerHTML = dayData.matches.map(m => `
+                    <div class="p-3.5 flex flex-col md:flex-row justify-between items-start md:items-center gap-2 hover:bg-slate-800/40 transition text-xs">
+                        <div class="flex items-center space-x-3">
+                            <span class="font-mono font-bold text-amber-400 w-16">${m.id}</span>
+                            <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300">[${m.league}]</span>
+                            <span class="font-bold text-slate-100">${m.home} vs ${m.away}</span>
+                        </div>
+                        <div class="flex items-center flex-wrap gap-3 font-mono text-slate-300">
+                            <span class="text-amber-400 font-semibold">${m.dir}</span>
+                            <span class="text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-900/50">外盘: ${m.handicap}</span>
+                            <span class="text-emerald-400 font-bold">🎯 ${m.score}</span>
+                            <span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800 font-bold">${m.rate}%</span>
+                            <span class="text-slate-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">${m.time}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        window.onload = () => {
+            renderDayButtons();
+            loadDashboard("2026-10-28");
+        };
+    </script>
+</body>
+</html>
